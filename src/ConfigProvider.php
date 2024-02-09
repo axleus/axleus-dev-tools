@@ -10,6 +10,7 @@ final class ConfigProvider
     {
         return [
             'dependencies' => $this->getDependencies(),
+            'middleware_pipeline' => $this->getPipelineConfig(),
         ];
     }
 
@@ -19,13 +20,17 @@ final class ConfigProvider
             'invokables' => [
                 Middleware\TracyDebuggerMiddleware::class => Middleware\TracyDebuggerMiddleware::class,
             ],
-            'middleware_pipeline' => [
-                [
-                    'middleware' => [
-                        Middleware\TracyDebuggerMiddleware::class,
-                    ],
-                    'priority' => 1,
+        ];
+    }
+
+    public function getPipelineConfig(): array
+    {
+        return [
+            [
+                'middleware' => [
+                    Middleware\TracyDebuggerMiddleware::class,
                 ],
+                'priority' => 12000,
             ],
         ];
     }
