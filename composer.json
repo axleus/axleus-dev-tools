@@ -17,7 +17,7 @@
     },
     "require": {
         "php": "~8.2.0",
-        "axleus/axleus-db": "^1.0.0",
+        "axleus/axleus-db": "^1.0.x-dev",
         "laminas/laminas-component-installer": "^3.2",
         "tracy/tracy": "^2.10",
         "webinertia/bjy-profiler": "^0.0.11"
