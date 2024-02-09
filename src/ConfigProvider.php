@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools;
 
-final readonly class ConfigProvider
+final class ConfigProvider
 {
     public function __invoke(): array
     {
