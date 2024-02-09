@@ -16,8 +16,8 @@
     "suggest": {
     },
     "require": {
-        "php": "~8.1.0 || ~8.2.0",
-        "laminas/laminas-db": "^2.18.0",
+        "php": "~8.2.0",
+        "axleus/axleus-db": "^1.0.0",
         "laminas/laminas-component-installer": "^3.2",
         "tracy/tracy": "^2.10",
         "webinertia/bjy-profiler": "^0.0.11"
