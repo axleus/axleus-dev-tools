@@ -20,8 +20,7 @@
         "axleus/axleus-db": "^1.0.x-dev",
         "laminas/laminas-config": "^3.9.0",
         "mezzio/mezzio-tooling": "^2.9.0",
-        "tracy/tracy": "^2.10",
-        "webinertia/bjy-profiler": "1.0.x-dev"
+        "tracy/tracy": "^2.10"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "^2.5",
