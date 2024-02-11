@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools\Debug;
 
+use Laminas\Db\Adapter\Adapter;
 use Tracy\IBarPanel;
 
-final class ConfigPanel implements IBarPanel
+final class SqlProfilerPanel implements IBarPanel
 {
     use IBarPanelTrait;
 
     public function __construct(
-        private array $data
+        private Adapter $data
     ) {
-        $this->id = 'config';
+        $this->id = 'database';
     }
 }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Axleus\DevTools\Debug;
 
 $count = null;
-if (isset($profiler)) {
-    $count = count($profiler->getProfiles());
+if (isset($data)) {
+    $count = count($data->getProfiler()->getProfiles());
 }
 ?>
 <svg viewBox="0 0 2048 2048">

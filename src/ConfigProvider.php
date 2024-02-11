@@ -27,8 +27,9 @@ final class ConfigProvider
                 Console\Command\DbConfigCommand::class    => Console\Command\Factory\DbConfigCommandFactory::class,
                 Console\Command\BuildDbCommand::class     => Console\Command\Factory\BuildDbCommandFactory::class,
                 Debug\ConfigPanel::class                  => Debug\ConfigPanelFactory::class,
-                Debug\SqlProfiler::class                  => Debug\SqlProfilerFactory::class,
+                Debug\SqlProfilerPanel::class             => Debug\SqlProfilerPanelFactory::class,
                 Middleware\TracyDebuggerMiddleware::class => Middleware\TracyDebuggerMiddlewareFactory::class,
+                Middleware\RequestPanelMiddleware::class  => Middleware\RequestPanelMiddlewareFactory::class,
             ],
             'delegators' => [
                 AdapterInterface::class => [
@@ -61,6 +62,12 @@ final class ConfigProvider
                     Middleware\TracyDebuggerMiddleware::class,
                 ],
                 'priority' => 12000,
+            ],
+            [
+                'middleware' => [
+                    Middleware\RequestPanelMiddleware::class,
+                ],
+                'priority' => 1,
             ],
         ];
     }

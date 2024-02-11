@@ -9,7 +9,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-final class TracyDebuggerMiddlewareFactory
+final class RequestPanelMiddlewareFactory
 {
     /**
      *
@@ -18,16 +18,14 @@ final class TracyDebuggerMiddlewareFactory
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
      */
-    public function __invoke(ContainerInterface $container): TracyDebuggerMiddleware
+    public function __invoke(ContainerInterface $container): RequestPanelMiddleware
     {
         /** @var bool */
         $debug    = $container->get('config')['debug'];
         /** @var bool */
         $override = $container->get('config')['debug_overrides']['show_debugger_in_production'];
 
-        return new TracyDebuggerMiddleware(
-            $container->get(Debug\ConfigPanel::class),
-            $container->get(Debug\SqlProfilerPanel::class),
+        return new RequestPanelMiddleware(
             $debug ? $debug : $override
         );
     }

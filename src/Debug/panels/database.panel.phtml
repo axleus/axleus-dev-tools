@@ -20,7 +20,7 @@ use Tracy\Helpers;
 <h1>Query Profiles</h1>
 <div class="tracy-inner tracy-QueryPanel">
     <div class="tracy-inner-container">
-        <?php foreach ($profiler->getProfiles() as $profile): ?>
+        <?php foreach ($data->getProfiler()->getProfiles() as $profile): ?>
             <div class="tracy-QueryPanel-queries">
                 <table>
                     <thead>

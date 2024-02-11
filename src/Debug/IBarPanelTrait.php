@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools\Debug;
 
-use Laminas\Db\Adapter\Adapter;
-use Tracy\IBarPanel;
 use Tracy\Helpers;
 
-final class SqlProfiler implements IBarPanel
+trait IBarPanelTrait
 {
-    public function __construct(
-        private string $id,
-        private Adapter $adapter
-    ) {
-    }
+    protected string $id;
 
     public function getTab(): string
     {
         return Helpers::capture(function () {
-            $profiler = $this->adapter->getProfiler();
+            $data = $this->data;
             require __DIR__ . "/panels/{$this->id}.tab.phtml";
         });
     }
@@ -27,7 +21,7 @@ final class SqlProfiler implements IBarPanel
     public function getPanel(): string
     {
         return Helpers::capture(function () {
-            $profiler = $this->adapter->getProfiler();
+            $data = $this->data;
             require __DIR__ . "/panels/{$this->id}.panel.phtml";
         });
     }

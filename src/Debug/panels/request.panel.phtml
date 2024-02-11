@@ -7,7 +7,7 @@ namespace Axleus\DevTools\Debug;
 use Tracy\Debugger;
 use Tracy\Dumper;
 
-if (count($data) < 1) {
+if (! isset($data)) {
     return;
 }
 
