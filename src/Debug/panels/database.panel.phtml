@@ -1,0 +1,64 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Axleus\DevTools\Debug;
+
+use Tracy\Helpers;
+
+?>
+<style class="tracy-debug">
+	#tracy-debug .tracy-QueryPanel td:nth-child(2) {
+		font-weight: bold;
+		width: 60%;
+	}
+	#tracy-debug .tracy-QueryPanel td[colspan='2'] b {
+		margin-left: 2em;
+		white-space: normal;
+	}
+</style>
+<h1>Query Profiles</h1>
+<div class="tracy-inner tracy-QueryPanel">
+    <div class="tracy-inner-container">
+        <?php foreach ($profiler->getProfiles() as $profile): ?>
+            <div class="tracy-QueryPanel-queries">
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="3">
+                                <?php if ($profile['sql']): ?>
+                                    <h3><?= Helpers::escapeHtml($profile['sql']) ?></h3>
+                                <?php endif ?>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">Timing:</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">Start: <?=$profile['start']?></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">End: <?=$profile['end']?></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><b>Elapsed: <?=$profile['elapse']?><b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">Parameters:</td>
+                        </tr>
+                        <?php
+                        foreach ($profile['parameters']->getNamedArray() as $position => $value): ?>
+                        <tr>
+                            <td><?=$position?></td>
+                            <td><?=$value?></td>
+                        </tr>
+                        <?php
+                        endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endforeach ?>
+    </div>
+</div>

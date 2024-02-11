@@ -29,12 +29,6 @@
         "roave/security-advisories": "dev-master",
         "vimeo/psalm": "^5.14"
     },
-    "extra": {
-        "laminas": {
-            "module": "Axleus\\DevTools",
-            "config-provider": "Axleus\\DevTools\\ConfigProvider"
-        }
-    },
     "autoload": {
         "psr-4": {
             "Axleus\\DevTools\\": "src/"
