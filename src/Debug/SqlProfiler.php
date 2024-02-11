@@ -19,17 +19,16 @@ final class SqlProfiler implements IBarPanel
     public function getTab(): string
     {
         return Helpers::capture(function () {
-			$profiler = $this->adapter->getProfiler();
-			require __DIR__ . "/panels/{$this->id}.tab.phtml";
-		});
+            $profiler = $this->adapter->getProfiler();
+            require __DIR__ . "/panels/{$this->id}.tab.phtml";
+        });
     }
 
     public function getPanel(): string
     {
         return Helpers::capture(function () {
-			$profiler = $this->adapter->getProfiler();
-			require __DIR__ . "/panels/{$this->id}.panel.phtml";
-		});
+            $profiler = $this->adapter->getProfiler();
+            require __DIR__ . "/panels/{$this->id}.panel.phtml";
+        });
     }
-
 }

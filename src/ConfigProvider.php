@@ -26,6 +26,7 @@ final class ConfigProvider
             'factories' => [
                 Console\Command\DbConfigCommand::class    => Console\Command\Factory\DbConfigCommandFactory::class,
                 Console\Command\BuildDbCommand::class     => Console\Command\Factory\BuildDbCommandFactory::class,
+                Debug\ConfigPanel::class                  => Debug\ConfigPanelFactory::class,
                 Debug\SqlProfiler::class                  => Debug\SqlProfilerFactory::class,
                 Middleware\TracyDebuggerMiddleware::class => Middleware\TracyDebuggerMiddlewareFactory::class,
             ],

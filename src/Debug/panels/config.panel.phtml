@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Axleus\DevTools\Debug;
+
+use Tracy\Debugger;
+use Tracy\Dumper;
+
+if (count($config) < 1) {
+    return;
+}
+
+Dumper::renderAssets();
+Debugger::$maxLength = 250;
+?>
+<div class="tracy-inner tracy-QueryPanel">
+    <div class="tracy-inner-container">
+        <?php Dumper::dump($config);?>
+    </div>
+</div>
