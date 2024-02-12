@@ -14,6 +14,7 @@ use Tracy\Debugger;
 class RequestPanelMiddleware implements MiddlewareInterface
 {
     public function __construct(
+        private Debug\RequestPanel $panel,
         private bool $debug
     ) {
     }
@@ -21,7 +22,8 @@ class RequestPanelMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($this->debug) {
-            Debugger::getBar()->addPanel(new Debug\RequestPanel($request));
+            $this->panel->setData($request);
+            Debugger::getBar()->addPanel($this->panel);
             Debugger::$showBar = true;
         }
         return $handler->handle($request);

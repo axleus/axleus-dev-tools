@@ -26,6 +26,7 @@ final class RequestPanelMiddlewareFactory
         $override = $container->get('config')['debug_overrides']['show_debugger_in_production'];
 
         return new RequestPanelMiddleware(
+            $container->get(Debug\RequestPanel::class),
             $debug ? $debug : $override
         );
     }
