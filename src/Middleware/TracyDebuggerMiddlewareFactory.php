@@ -28,6 +28,7 @@ final class TracyDebuggerMiddlewareFactory
         return new TracyDebuggerMiddleware(
             $container->get(Debug\ConfigPanel::class),
             $container->get(Debug\SqlProfilerPanel::class),
+            $container->get(Debug\RoutesPanel::class),
             $debug ? $debug : $override
         );
     }
