@@ -6,8 +6,9 @@ namespace Axleus\DevTools\Debug;
 
 use Tracy\Debugger;
 use Tracy\Dumper;
+use Mezzio\Router\RouteCollectorInterface;
 
-if (count($data) < 1) {
+if(! $data instanceof RouteCollectorInterface) {
     return;
 }
 
@@ -16,6 +17,6 @@ Debugger::$maxLength = 250;
 ?>
 <div class="tracy-inner tracy-QueryPanel">
     <div class="tracy-inner-container">
-        <?php Dumper::dump($data);?>
+        <?php Dumper::dump($data->getRoutes());?>
     </div>
 </div>
