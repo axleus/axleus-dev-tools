@@ -32,6 +32,7 @@ final class ConfigProvider
                 Debug\ConfigPanel::class                  => Debug\ConfigPanelFactory::class,
                 Debug\RequestPanel::class                 => Debug\RequestPanelFactory::class,
                 Debug\SqlProfilerPanel::class             => Debug\SqlProfilerPanelFactory::class,
+                Debug\RoutesPanel::class                  => Debug\RoutesPanelFactory::class,
                 Middleware\TracyDebuggerMiddleware::class => Middleware\TracyDebuggerMiddlewareFactory::class,
                 Middleware\RequestPanelMiddleware::class  => Middleware\RequestPanelMiddlewareFactory::class,
             ],
@@ -46,6 +47,9 @@ final class ConfigProvider
                     TranslatorDelegator::class,
                 ],
                 Debug\SqlProfilerPanel::class => [
+                    TranslatorDelegator::class,
+                ],
+                Debug\RoutesPanel::class => [
                     TranslatorDelegator::class,
                 ],
             ],
