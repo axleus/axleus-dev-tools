@@ -16,6 +16,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
     public function __construct(
         private Debug\ConfigPanel $configPanel,
         private Debug\SqlProfilerPanel $sqlProfilerPanel,
+        private Debug\RoutesPanel $routesPanel,
         private bool $debug
     ) {
     }
@@ -25,6 +26,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
         if ($this->debug) {
             Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             Debugger::getBar()->addPanel($this->configPanel);
+            Debugger::getBar()->addPanel($this->routesPanel);
             Debugger::enable();
             Debugger::$showBar = false;
         }
