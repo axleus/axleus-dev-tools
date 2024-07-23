@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools;
 
-use Axleus\Service\Delegator\TranslatorAwareInterfaceDelegatorFactory as TranslatorDelegator;
 use Laminas\Db\Adapter\AdapterInterface;
 use Laminas\I18n\Translator\Loader\PhpArray;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 final class ConfigProvider
 {
@@ -18,8 +18,9 @@ final class ConfigProvider
             ],
             'dependencies'        => $this->getDependencies(),
             'laminas-cli'         => $this->getConsoleConfig(),
-            'middleware_pipeline' => $this->getPipelineConfig(),
+            //'middleware_pipeline' => $this->getPipelineConfig(),
             'translator'          => $this->getTranslatorConfig(),
+            'view_helpers'        => $this->getViewHelpers(),
         ];
     }
 
@@ -41,16 +42,16 @@ final class ConfigProvider
                     Db\Adapter\AdapterServiceDelegatorFactory::class,
                 ],
                 Debug\ConfigPanel::class => [
-                    TranslatorDelegator::class,
+                    Container\TranslatorAwareInterfaceDelegatorFactory::class,
                 ],
                 Debug\RequestPanel::class => [
-                    TranslatorDelegator::class,
+                    Container\TranslatorAwareInterfaceDelegatorFactory::class
                 ],
                 Debug\SqlProfilerPanel::class => [
-                    TranslatorDelegator::class,
+                    Container\TranslatorAwareInterfaceDelegatorFactory::class,
                 ],
                 Debug\RoutesPanel::class => [
-                    TranslatorDelegator::class,
+                    Container\TranslatorAwareInterfaceDelegatorFactory::class,
                 ],
             ],
         ];
@@ -71,23 +72,37 @@ final class ConfigProvider
         ];
     }
 
-    public function getPipelineConfig(): array
+    public function getViewHelpers(): array
     {
         return [
-            [
-                'middleware' => [
-                    Middleware\TracyDebuggerMiddleware::class,
-                ],
-                'priority' => 12000,
+            'aliases' => [
+                'tracy'    => View\Helper\Tracy::class,
+                'debug'    => View\Helper\Tracy::class,
+                'debugger' => View\Helper\Tracy::class,
             ],
-            [
-                'middleware' => [
-                    Middleware\RequestPanelMiddleware::class,
-                ],
-                'priority' => 1,
+            'factories' => [
+                View\Helper\Tracy::class => InvokableFactory::class,
             ],
         ];
     }
+
+    // public function getPipelineConfig(): array
+    // {
+    //     // return [
+    //     //     [
+    //     //         'middleware' => [
+    //     //             Middleware\TracyDebuggerMiddleware::class,
+    //     //         ],
+    //     //         'priority' => 12000,
+    //     //     ],
+    //     //     [
+    //     //         'middleware' => [
+    //     //             Middleware\RequestPanelMiddleware::class,
+    //     //         ],
+    //     //         'priority' => 1,
+    //     //     ],
+    //     // ];
+    // }
 
     public function getTranslatorConfig(): array
     {
