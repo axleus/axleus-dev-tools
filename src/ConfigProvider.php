@@ -7,6 +7,7 @@ namespace Axleus\DevTools;
 use Laminas\Db\Adapter\AdapterInterface;
 use Laminas\I18n\Translator\Loader\PhpArray;
 use Laminas\ServiceManager\Factory\InvokableFactory;
+use Mezzio\Application;
 
 final class ConfigProvider
 {
@@ -28,6 +29,7 @@ final class ConfigProvider
     {
         return [
             'factories' => [
+                Application::class                        => Container\ApplicationFactory::class,
                 Console\Command\DbConfigCommand::class    => Console\Command\Factory\DbConfigCommandFactory::class,
                 Console\Command\BuildDbCommand::class     => Console\Command\Factory\BuildDbCommandFactory::class,
                 Debug\ConfigPanel::class                  => Debug\ConfigPanelFactory::class,
