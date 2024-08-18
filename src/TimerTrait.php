@@ -10,6 +10,8 @@ use function number_format;
 
 trait TimerTrait
 {
+    private const TOTAL_RUNTIME = 'total-runtime';
+
     private ?string $marker;
     /**
      *
@@ -25,7 +27,7 @@ trait TimerTrait
         if (!empty($tag)) {
             $tag = '.' . $tag;
         }
-        $marker = $this->marker === $marker ? $this->marker : 'total-runtime';
+        $marker = $this->marker === $marker ? $this->marker : static::TOTAL_RUNTIME;
         $time = number_format(Debugger::timer($marker) * 1000, 5, '.', "\u{202f}") . ' ms';
         Debugger::barDump($time, $marker . $tag);
     }
@@ -35,5 +37,4 @@ trait TimerTrait
         $this->marker = $marker;
         Debugger::timer($this->marker);
     }
-
 }

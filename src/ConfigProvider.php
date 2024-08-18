@@ -78,12 +78,11 @@ final class ConfigProvider
     {
         return [
             'aliases' => [
-                'tracy'    => View\Helper\Tracy::class,
-                'debug'    => View\Helper\Tracy::class,
-                'debugger' => View\Helper\Tracy::class,
+                'timer'    => View\Helper\StopWatch::class,
+                'stopWatch' => View\Helper\StopWatch::class,
             ],
             'factories' => [
-                View\Helper\Tracy::class => InvokableFactory::class,
+                View\Helper\StopWatch::class => InvokableFactory::class,
             ],
         ];
     }
