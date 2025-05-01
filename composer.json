@@ -9,25 +9,17 @@
     "authors": [
         {
             "name": "Joey Smith",
-            "email": "jsmith@webinertia.net",
+            "email": "jsmith@axleus.org",
             "homepage": "https://github.com/axleus"
         }
     ],
     "suggest": {
     },
     "require": {
-        "php": "~8.2.0",
-        "axleus/axleus-db": "^1.0.x-dev",
+        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
         "laminas/laminas-config": "^3.9.0",
         "mezzio/mezzio-tooling": "^2.9.0",
         "tracy/tracy": "^2.10"
-    },
-    "require-dev": {
-        "laminas/laminas-coding-standard": "^2.5",
-        "phpunit/phpunit": "^10.2",
-        "psalm/plugin-phpunit": "^0.18.4",
-        "roave/security-advisories": "dev-master",
-        "vimeo/psalm": "^5.14"
     },
     "autoload": {
         "psr-4": {
