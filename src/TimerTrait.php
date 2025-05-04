@@ -16,7 +16,7 @@ trait TimerTrait
         $now           = hrtime(true);
         $delta         = isset($time[$marker]) ? $now - $time[$marker] : 0;
         $time[$marker] = $now;
-        $elapsed = $delta / 1e+6;
+        $elapsed       = $delta / 1e+6;
         if (isset($time[$marker]) && $elapsed > 0) {
             Debugger::barDump($marker . ' ' . $elapsed . ' ms');
         }
