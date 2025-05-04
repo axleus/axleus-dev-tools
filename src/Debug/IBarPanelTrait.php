@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools\Debug;
 
-use Axleus\DevTools\Constants;
 use Tracy\Helpers;
 
 trait IBarPanelTrait
@@ -15,7 +14,7 @@ trait IBarPanelTrait
     {
         return Helpers::capture(function () {
             $data = $this->data;
-            $title = $this->getTranslator()->translate($this->id . Constants::PANEL_LABEL_TRANS_KEY, Constants::TEXT_DOMAIN);
+            $title = $this->id;
             require __DIR__ . "/panels/{$this->id}.tab.phtml";
         });
     }

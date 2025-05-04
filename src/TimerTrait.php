@@ -19,7 +19,7 @@ trait TimerTrait
      * @param null|string $tag Is appended to the passed $marker
      * @return void
      */
-    public function stopWatch(?string $marker = null, ?string $tag = '')
+    public function stopWatch(string $marker, ?string $tag = '')
     {
         if (null !== $marker) {
             $this->marker = $marker;
@@ -32,9 +32,15 @@ trait TimerTrait
         Debugger::barDump($time, $marker . $tag);
     }
 
-    public function start(?string $marker): void
+    public static function timer(string $marker): void
     {
-        $this->marker = $marker;
-        Debugger::timer($this->marker);
+        static $time = [];
+        $now   = hrtime(true);
+        $delta = isset($time[$marker]) ? $now - $time[$marker] : 0;
+        $time[$marker] = $now;
+        $elapsed = $delta / 1e+6;
+        if (isset($time[$marker]) && $elapsed > 0) {
+            Debugger::barDump($marker . ' ' . $elapsed . ' ms');
+        }
     }
 }
