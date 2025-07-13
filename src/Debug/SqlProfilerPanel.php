@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools\Debug;
 
-use Laminas\Db\Adapter\AdapterInterface;
+use PhpDb\Adapter\AdapterInterface;
 use Tracy\IBarPanel;
 
 final class SqlProfilerPanel implements IBarPanel

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools;
 
-use Laminas\Db\Adapter\AdapterInterface;
+use PhpDb\Adapter\AdapterInterface;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Mezzio\Application;
 use Tracy\Debugger;

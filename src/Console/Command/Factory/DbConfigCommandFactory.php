@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Axleus\DevTools\Console\Command\Factory;
 
 use Axleus\DevTools\Console\Command\DbConfigCommand;
-use Laminas\Db\Adapter\AdapterInterface;
+use PhpDb\Adapter\AdapterInterface;
 use Psr\Container\ContainerInterface;
 
 final class DbConfigCommandFactory
