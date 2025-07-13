@@ -6,8 +6,8 @@ namespace Axleus\DevTools\Console\Command;
 
 use DirectoryIterator;
 use Laminas\Cli\Input\ParamAwareInputInterface;
-use Laminas\Db\Adapter\Adapter;
-use Laminas\Db\Adapter\AdapterInterface;
+use PhpDb\Adapter\Adapter;
+use PhpDb\Adapter\AdapterInterface;
 use SplFileObject;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

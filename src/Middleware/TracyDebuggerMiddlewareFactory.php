@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools\Middleware;
 
+use Axleus\DevTools\ConfigProvider;
 use Axleus\DevTools\Debug;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Tracy\Debugger;
 
 final class TracyDebuggerMiddlewareFactory
 {
@@ -21,15 +23,15 @@ final class TracyDebuggerMiddlewareFactory
     public function __invoke(ContainerInterface $container): TracyDebuggerMiddleware
     {
         /** @var bool */
-        $debug    = $container->get('config')['debug'];
-        /** @var bool */
-        $override = $container->get('config')['debug_overrides']['show_debugger_in_production'];
+        $debug    = [
+            'debug' => $container->get('config')['debug']]
+                + $container->get('config')[ConfigProvider::class][Debugger::class];
 
         return new TracyDebuggerMiddleware(
             $container->get(Debug\ConfigPanel::class),
             $container->get(Debug\SqlProfilerPanel::class),
             $container->get(Debug\RoutesPanel::class),
-            $debug ? $debug : $override
+            $debug,
         );
     }
 }

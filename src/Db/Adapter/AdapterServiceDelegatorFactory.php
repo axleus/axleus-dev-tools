@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools\Db\Adapter;
 
-use Laminas\Db\Adapter\AdapterInterface;
-use Laminas\Db\Adapter\Profiler\Profiler;
+use PhpDb\Adapter\AdapterInterface;
+use PhpDb\Adapter\Profiler\Profiler;
 use Psr\Container\ContainerInterface;
 
 final class AdapterServiceDelegatorFactory

@@ -17,18 +17,26 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
         private Debug\ConfigPanel $configPanel,
         private Debug\SqlProfilerPanel $sqlProfilerPanel,
         private Debug\RoutesPanel $routesPanel,
-        private bool $debug
+        private array $debugConfig
     ) {
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($this->debug) {
+        if ($this->debugConfig['debug']) {
+            unset($this->debugConfig['debug']);
+            // foreach ($this->debugConfig as $key => $value) {
+            //     if ($key === 'strictMode') {
+            //         continue;
+            //     }
+            //     Debugger::${$key} = $value;
+            // }
+            // Debugger::$strictMode = $this->debugConfig['strictMode'];
+            // Debugger::$dumpTheme  = $this->debugConfig['dumpTheme'];
             Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             Debugger::getBar()->addPanel($this->configPanel);
             Debugger::getBar()->addPanel($this->routesPanel);
-            Debugger::enable();
-            Debugger::$showBar = false;
+
         }
         return $handler->handle($request);
     }

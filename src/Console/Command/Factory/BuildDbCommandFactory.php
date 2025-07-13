@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Axleus\DevTools\Console\Command\Factory;
 
-use Laminas\Db\Adapter\AdapterInterface;
+use PhpDb\Adapter\AdapterInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerInterface;
 use Axleus\DevTools\Console\Command\BuildDbCommand;
