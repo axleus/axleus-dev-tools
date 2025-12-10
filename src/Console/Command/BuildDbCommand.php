@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Console\Command;
+namespace Webware\DevTools\Console\Command;
 
 use DirectoryIterator;
 use Laminas\Cli\Input\ParamAwareInputInterface;

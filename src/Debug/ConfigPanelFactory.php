@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Debug;
+namespace Webware\DevTools\Debug;
 
 use Psr\Container\ContainerInterface;
 

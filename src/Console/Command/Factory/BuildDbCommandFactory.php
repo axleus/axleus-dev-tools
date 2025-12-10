@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Console\Command\Factory;
+namespace Webware\DevTools\Console\Command\Factory;
 
 use PhpDb\Adapter\AdapterInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerInterface;
-use Axleus\DevTools\Console\Command\BuildDbCommand;
+use Webware\DevTools\Console\Command\BuildDbCommand;
 
 class BuildDbCommandFactory implements FactoryInterface
 {

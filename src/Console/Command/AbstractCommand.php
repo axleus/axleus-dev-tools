@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Console\Command;
+namespace Webware\DevTools\Console\Command;
 
 use Laminas\Cli\Command\AbstractParamAwareCommand;
 

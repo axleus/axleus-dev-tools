@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools;
+namespace Webware\DevTools;
 
 final class StopWatch
 {

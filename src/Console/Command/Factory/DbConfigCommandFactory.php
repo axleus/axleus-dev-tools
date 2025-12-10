@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Console\Command\Factory;
+namespace Webware\DevTools\Console\Command\Factory;
 
-use Axleus\DevTools\Console\Command\DbConfigCommand;
+use Webware\DevTools\Console\Command\DbConfigCommand;
 use PhpDb\Adapter\AdapterInterface;
 use Psr\Container\ContainerInterface;
 

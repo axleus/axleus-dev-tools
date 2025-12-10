@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Console\Command;
+namespace Webware\DevTools\Console\Command;
 
 use Laminas\Cli\Input\ParamAwareInputInterface;
 use Laminas\Cli\Input\StringParam;
@@ -26,9 +26,9 @@ final class DbConfigCommand extends AbstractCommand
     /** @var string $defaultName */
     protected static $defaultName = 'db-config';
     /** @var string $defaultDescription */
-    protected static $defaultDescription = 'Configure MySQL connection for the Axleus Platform';
+    protected static $defaultDescription = 'Configure MySQL connection for the Webware Platform';
     /** @var string $defaultHelp */
-    protected static $defaultHelp = 'This command allows you to configure a MySQL connection configuration for the Axleus Platform.';
+    protected static $defaultHelp = 'This command allows you to configure a MySQL connection configuration for the Webware Platform.';
     protected function configure(): void
     {
         $this->setName(self::$defaultName);

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Middleware;
+namespace Webware\DevTools\Middleware;
 
-use Axleus\DevTools\Debug;
+use Webware\DevTools\Debug;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;

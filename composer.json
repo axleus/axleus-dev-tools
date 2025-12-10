@@ -1,32 +1,40 @@
 {
-    "name": "axleus/axleus-dev-tools",
-    "description": "Developer tooling for the Axleus platform",
+    "name": "webware/dev-tools",
+    "description": "Tracy Debugger integration for Mezzio apps.",
     "license": "BSD-3-Clause",
     "keywords": [
-        "axleus",
-        "axleus dev tools"
+        "webware",
+        "webware dev tools"
     ],
     "authors": [
         {
             "name": "Joey Smith",
-            "email": "jsmith@axleus.org",
-            "homepage": "https://github.com/axleus"
+            "email": "jsmith@webinertia.net",
+            "homepage": "https://github.com/tyrsson/dev-tools/discussions",
+            "role": "Maintainer"
         }
     ],
     "suggest": {
     },
     "require": {
-        "php": "~8.1.0 || ~8.2.0 || ~8.3.0 || ~8.4.0",
-        "tracy/tracy": "^2.10"
+        "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+        "tracy/tracy": "^2.11.0"
+    },
+    "require-dev": {
+        "laminas/laminas-coding-standard": "^3.1",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpunit/phpunit": "^11.5.42",
+        "roave/security-advisories": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "Axleus\\DevTools\\": "src/"
+            "Webware\\DevTools\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "AxleusTest\\DevToolsTest\\": "test/"
+            "WebwareTest\\DevToolsTest\\": "test/"
         }
     },
     "scripts": {
@@ -37,10 +45,10 @@
         ],
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
-        "static-analysis": "psalm --shepherd --stats",
-        "test": "phpunit --colors=always --testsuite \"unit test\"",
+        "test": "phpunit --colors=always",
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
-        "test-integration": "phpunit --colors=always --testsuite \"integration test\""
+        "sa": "vendor/bin/phpstan analyse --memory-limit=256M",
+        "sa-baseline": "vendor/bin/phpstan analyse --memory-limit=256M --generate-baseline"
     },
     "config": {
         "sort-packages": true,

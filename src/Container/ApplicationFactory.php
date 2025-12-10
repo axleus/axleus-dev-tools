@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\Container;
+namespace Webware\DevTools\Container;
 
-use Axleus\DevTools\Application;
+use Webware\DevTools\Application;
 use Laminas\HttpHandlerRunner\RequestHandlerRunnerInterface;
 //use Mezzio\Application;
 use Mezzio\ApplicationPipeline;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools\View\Helper;
+namespace Webware\DevTools\View\Helper;
 
-use Axleus\DevTools\TimerTrait;
+use Webware\DevTools\TimerTrait;
 
 class StopWatch
 {

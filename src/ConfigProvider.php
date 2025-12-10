@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Axleus\DevTools;
+namespace Webware\DevTools;
 
 use PhpDb\Adapter\AdapterInterface;
 use Laminas\ServiceManager\Factory\InvokableFactory;
@@ -21,11 +21,11 @@ final class ConfigProvider
             'laminas-cli'         => $this->getConsoleConfig(),
             //'middleware_pipeline' => $this->getPipelineConfig(),
             'view_helpers'        => $this->getViewHelpers(),
-            static::class         => $this->getAxleusConfig(),
+            static::class         => $this->getWebwareConfig(),
         ];
     }
 
-    public function getAxleusConfig(): array
+    public function getWebwareConfig(): array
     {
         return [
             Debugger::class => [
@@ -64,8 +64,8 @@ final class ConfigProvider
     {
         return [
             'commands' => [
-                'axleus:db:write-config' => Console\Command\DbConfigCommand::class,
-                'axleus:db:create'       => Console\Command\BuildDbCommand::class,
+                'Webware:db:write-config' => Console\Command\DbConfigCommand::class,
+                'Webware:db:create'       => Console\Command\BuildDbCommand::class,
             ],
             // 'chains'   => [
             //     Console\Command\DbConfigCommand::class => [
