@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Webware\DevTools\Db\Adapter;
+namespace Webware\DevTools\PhpDb;
 
 use PhpDb\Adapter\AdapterInterface;
 use PhpDb\Adapter\Profiler\Profiler;
 use Psr\Container\ContainerInterface;
 
-final class AdapterServiceDelegatorFactory
+final class ProfilingDelegator
 {
     public function __invoke(ContainerInterface $container, string $name, callable $callback): AdapterInterface
     {

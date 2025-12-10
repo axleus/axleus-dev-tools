@@ -4,34 +4,28 @@ declare(strict_types=1);
 
 namespace Webware\DevTools\Middleware;
 
-use Webware\DevTools\ConfigProvider;
 use Webware\DevTools\Debug;
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Tracy\Debugger;
+
+use function class_exists;
 
 final class TracyDebuggerMiddlewareFactory
 {
-    /**
-     *
-     * @param ContainerInterface $container
-     * @return TracyDebuggerMiddleware
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
-     */
     public function __invoke(ContainerInterface $container): TracyDebuggerMiddleware
     {
-        /** @var bool */
-        $debug    = [
-            'debug' => $container->get('config')['debug']]
-                + $container->get('config')[ConfigProvider::class][Debugger::class];
-
+        $sqlProfilerPanel = null;
+        if (class_exists(\PhpDb\Adapter\AdapterInterface::class)) {
+            // Ensure the SqlProfilerPanel is registered
+            $sqlProfilerPanel = $container->get(Debug\SqlProfilerPanel::class);
+        }
         return new TracyDebuggerMiddleware(
-            $container->get(Debug\ConfigPanel::class),
-            $container->get(Debug\SqlProfilerPanel::class),
-            $container->get(Debug\RoutesPanel::class),
-            $debug,
+            $container->get('config')['debug'],
+            $container->get('config')[Debugger::class],
+            $container->has(Debug\ConfigPanel::class) ? $container->get(Debug\ConfigPanel::class) : null,
+            $sqlProfilerPanel,
+            $container->has(Debug\RoutesPanel::class) ? $container->get(Debug\RoutesPanel::class) : null,
+
         );
     }
 }
