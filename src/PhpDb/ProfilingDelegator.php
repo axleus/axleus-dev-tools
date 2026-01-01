@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Webware\DevTools\PhpDb;
+namespace Webware\Traccio\PhpDb;
 
 use PhpDb\Adapter\AdapterInterface;
 use PhpDb\Adapter\Profiler\Profiler;
@@ -15,6 +15,7 @@ final class ProfilingDelegator
         /** @var AdapterInterface $adapter */
         $adapter = $callback($container, $name);
         $adapter->setProfiler(new Profiler());
+
         return $adapter;
     }
 }

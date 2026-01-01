@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Webware\DevTools;
+namespace Webware\Traccio;
 
-use PhpDb\Adapter\AdapterInterface;
 use Mezzio\Application;
+use PhpDb\Adapter\AdapterInterface;
 use Tracy\Debugger;
 
 final class ConfigProvider
@@ -28,7 +28,7 @@ final class ConfigProvider
                 'password',
                 'pass',
                 'secret',
-            ]
+            ],
         ];
     }
 
@@ -68,7 +68,7 @@ final class ConfigProvider
     public function getViewHelpers(): array
     {
         return [
-            'aliases' => [
+            'aliases'    => [
                 'timer'     => View\Helper\StopWatch::class,
                 'stopWatch' => View\Helper\StopWatch::class,
             ],

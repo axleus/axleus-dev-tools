@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Webware\DevTools\Container;
+namespace Webware\Traccio\Container;
 
-use Webware\DevTools\Application;
 use Laminas\HttpHandlerRunner\RequestHandlerRunnerInterface;
-//use Mezzio\Application;
 use Mezzio\ApplicationPipeline;
+// use Mezzio\Application;
 use Mezzio\MiddlewareFactoryInterface;
 use Mezzio\Router\RouteCollector;
 use Mezzio\Router\RouteCollectorInterface;
 use Psr\Container\ContainerInterface;
+use Webware\Traccio\Application;
 
 /**
  * Create an Application instance.
@@ -32,10 +32,10 @@ class ApplicationFactory
         return new Application(
             $container->get(MiddlewareFactoryInterface::class),
             $container->get(ApplicationPipeline::class),
-            $container->has(RouteCollectorInterface::class) ?
-                $container->get(RouteCollectorInterface::class) :
-                $container->get(RouteCollector::class),
-            $container->get(RequestHandlerRunnerInterface::class)
+            $container->has(RouteCollectorInterface::class)
+                ? $container->get(RouteCollectorInterface::class)
+                : $container->get(RouteCollector::class),
+            $container->get(RequestHandlerRunnerInterface::class),
         );
     }
 }

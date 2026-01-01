@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Webware\DevTools;
+namespace Webware\Traccio;
 
 use Laminas\HttpHandlerRunner\RequestHandlerRunnerInterface;
 use Laminas\Stratigility\MiddlewarePipeInterface;
+
+use function Laminas\Stratigility\path;
+
 use Mezzio\Application as MezzioApplication;
 use Mezzio\MiddlewareFactoryInterface;
 use Mezzio\Router;
@@ -14,8 +17,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-
-use function Laminas\Stratigility\path;
 
 /** @psalm-import-type MiddlewareParam from MiddlewareFactory */
 class Application extends MezzioApplication
@@ -26,9 +27,8 @@ class Application extends MezzioApplication
         private MiddlewareFactoryInterface $factory,
         private MiddlewarePipeInterface $pipeline,
         private RouteCollectorInterface $routes,
-        private RequestHandlerRunnerInterface $runner
-    ) {
-    }
+        private RequestHandlerRunnerInterface $runner,
+    ) {}
 
     /**
      * Proxies to composed pipeline to handle.
@@ -36,9 +36,10 @@ class Application extends MezzioApplication
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        static::timer($this::class . '::'. __METHOD__);
+        static::timer($this::class . '::' . __METHOD__);
         $handle = parent::handle($request);
-        static::timer($this::class . '::'. __METHOD__);
+        static::timer($this::class . '::' . __METHOD__);
+
         return $handle;
     }
 
@@ -72,19 +73,19 @@ class Application extends MezzioApplication
      *
      * The resulting middleware, in both cases, is piped to the pipeline.
      *
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middlewareOrPath
-     *     Either the middleware to pipe, or the path to segregate the $middleware
-     *     by, via a PathMiddlewareDecorator.
-     * @param null|string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     If present, middleware or request handler to segregate by the path
-     *     specified in $middlewareOrPath.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middlewareOrPath
+     *                                                                                            Either the middleware to pipe, or the path to segregate the $middleware
+     *                                                                                            by, via a PathMiddlewareDecorator
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string|null $middleware
+     *                                                                                           If present, middleware or request handler to segregate by the path
+     *                                                                                           specified in $middlewareOrPath
      * @psalm-param string|MiddlewareParam $middlewareOrPath
      * @psalm-param null|MiddlewareParam $middleware
      */
     public function pipe($middlewareOrPath, $middleware = null): void
     {
-        $middleware = $middleware ?? $middlewareOrPath;
-        $path       = $middleware === $middlewareOrPath ? '/' : $middlewareOrPath;
+        $middleware ??= $middlewareOrPath;
+        $path = $middleware === $middlewareOrPath ? '/' : $middlewareOrPath;
 
         $middleware = $path !== '/'
             ? path($path, $this->factory->prepare($middleware))
@@ -97,11 +98,11 @@ class Application extends MezzioApplication
      * Add a route for the route middleware to match.
      *
      * @param non-empty-string $path
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     Middleware or request handler (or service name resolving to one of
-     *     those types) to associate with route.
-     * @param null|list<string> $methods HTTP method to accept; null indicates any.
-     * @param null|non-empty-string $name The name of the route.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middleware
+     *                                                                                      Middleware or request handler (or service name resolving to one of
+     *                                                                                      those types) to associate with route
+     * @param list<string>|null $methods HTTP method to accept; null indicates any
+     * @param non-empty-string|null $name the name of the route
      */
     public function route(string $path, $middleware, ?array $methods = null, ?string $name = null): Router\Route
     {
@@ -109,16 +110,16 @@ class Application extends MezzioApplication
             $path,
             $this->factory->prepare($middleware),
             $methods,
-            $name
+            $name,
         );
     }
 
     /**
      * @param non-empty-string $path
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     Middleware or request handler (or service name resolving to one of
-     *     those types) to associate with route.
-     * @param null|non-empty-string $name The name of the route.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middleware
+     *                                                                                      Middleware or request handler (or service name resolving to one of
+     *                                                                                      those types) to associate with route
+     * @param non-empty-string|null $name the name of the route
      */
     public function get(string $path, $middleware, ?string $name = null): Router\Route
     {
@@ -127,10 +128,10 @@ class Application extends MezzioApplication
 
     /**
      * @param non-empty-string $path
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     Middleware or request handler (or service name resolving to one of
-     *     those types) to associate with route.
-     * @param null|non-empty-string $name The name of the route.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middleware
+     *                                                                                      Middleware or request handler (or service name resolving to one of
+     *                                                                                      those types) to associate with route
+     * @param non-empty-string|null $name the name of the route
      */
     public function post(string $path, $middleware, $name = null): Router\Route
     {
@@ -139,10 +140,10 @@ class Application extends MezzioApplication
 
     /**
      * @param non-empty-string $path
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     Middleware or request handler (or service name resolving to one of
-     *     those types) to associate with route.
-     * @param null|non-empty-string $name The name of the route.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middleware
+     *                                                                                      Middleware or request handler (or service name resolving to one of
+     *                                                                                      those types) to associate with route
+     * @param non-empty-string|null $name the name of the route
      */
     public function put(string $path, $middleware, ?string $name = null): Router\Route
     {
@@ -151,10 +152,10 @@ class Application extends MezzioApplication
 
     /**
      * @param non-empty-string $path
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     Middleware or request handler (or service name resolving to one of
-     *     those types) to associate with route.
-     * @param null|non-empty-string $name The name of the route.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middleware
+     *                                                                                      Middleware or request handler (or service name resolving to one of
+     *                                                                                      those types) to associate with route
+     * @param non-empty-string|null $name the name of the route
      */
     public function patch(string $path, $middleware, ?string $name = null): Router\Route
     {
@@ -163,10 +164,10 @@ class Application extends MezzioApplication
 
     /**
      * @param non-empty-string $path
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     Middleware or request handler (or service name resolving to one of
-     *     those types) to associate with route.
-     * @param null|non-empty-string $name The name of the route.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middleware
+     *                                                                                      Middleware or request handler (or service name resolving to one of
+     *                                                                                      those types) to associate with route
+     * @param non-empty-string|null $name the name of the route
      */
     public function delete(string $path, $middleware, ?string $name = null): Router\Route
     {
@@ -175,10 +176,10 @@ class Application extends MezzioApplication
 
     /**
      * @param non-empty-string $path
-     * @param string|array|callable|MiddlewareInterface|RequestHandlerInterface $middleware
-     *     Middleware or request handler (or service name resolving to one of
-     *     those types) to associate with route.
-     * @param null|non-empty-string $name The name of the route.
+     * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string $middleware
+     *                                                                                      Middleware or request handler (or service name resolving to one of
+     *                                                                                      those types) to associate with route
+     * @param non-empty-string|null $name the name of the route
      */
     public function any(string $path, $middleware, ?string $name = null): Router\Route
     {

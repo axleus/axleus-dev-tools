@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Webware\DevTools\Middleware;
+namespace Webware\Traccio\Middleware;
 
-use Webware\DevTools\Debug;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Tracy\Debugger;
+use Webware\Traccio\Debug;
 
 class TracyDebuggerMiddleware implements MiddlewareInterface
 {
@@ -19,8 +19,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
         private ?Debug\ConfigPanel $configPanel,
         private ?Debug\SqlProfilerPanel $sqlProfilerPanel,
         private ?Debug\RoutesPanel $routesPanel,
-    ) {
-    }
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -28,6 +27,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
             foreach ($this->tracyConfig as $key => $value) {
                 Debugger::${$key} = $value;
             }
+
             if (class_exists(\PhpDb\Adapter\AdapterInterface::class)) {
                 Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             }
@@ -35,6 +35,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
             Debugger::getBar()->addPanel($this->routesPanel);
 
         }
+
         return $handler->handle($request);
     }
 }
