@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Webware\DevTools;
+namespace Webware\Traccio;
 
-use PhpDb\Adapter\AdapterInterface;
 use Mezzio\Application;
+use PhpDb\Adapter\AdapterInterface;
 use Tracy\Debugger;
 
 final class ConfigProvider
@@ -14,8 +14,6 @@ final class ConfigProvider
     {
         return [
             'dependencies'  => $this->getDependencies(),
-            'laminas-cli'   => $this->getConsoleConfig(),
-            'view_helpers'  => $this->getViewHelpers(),
             Debugger::class => $this->getTracyConfig(),
         ];
     }
@@ -28,7 +26,7 @@ final class ConfigProvider
                 'password',
                 'pass',
                 'secret',
-            ]
+            ],
         ];
     }
 
@@ -37,8 +35,6 @@ final class ConfigProvider
         return [
             'factories' => [
                 Application::class                        => Container\ApplicationFactory::class,
-                Console\Command\DbConfigCommand::class    => Console\Command\Factory\DbConfigCommandFactory::class,
-                Console\Command\BuildDbCommand::class     => Console\Command\Factory\BuildDbCommandFactory::class,
                 Debug\ConfigPanel::class                  => Debug\ConfigPanelFactory::class,
                 Debug\RequestPanel::class                 => Debug\RequestPanelFactory::class,
                 Debug\SqlProfilerPanel::class             => Debug\SqlProfilerPanelFactory::class,
@@ -52,29 +48,6 @@ final class ConfigProvider
             //         PhpDb\ProfilingDelegator::class,
             //     ],
             // ],
-        ];
-    }
-
-    public function getConsoleConfig(): array
-    {
-        return [
-            'commands' => [
-                'Webware:db:write-config' => Console\Command\DbConfigCommand::class,
-                'Webware:db:create'       => Console\Command\BuildDbCommand::class,
-            ],
-        ];
-    }
-
-    public function getViewHelpers(): array
-    {
-        return [
-            'aliases' => [
-                'timer'     => View\Helper\StopWatch::class,
-                'stopWatch' => View\Helper\StopWatch::class,
-            ],
-            'invokables' => [
-                View\Helper\StopWatch::class => View\Helper\StopWatch::class,
-            ],
         ];
     }
 }
