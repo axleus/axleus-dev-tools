@@ -6,9 +6,6 @@ namespace Webware\Traccio;
 
 use Laminas\HttpHandlerRunner\RequestHandlerRunnerInterface;
 use Laminas\Stratigility\MiddlewarePipeInterface;
-
-use function Laminas\Stratigility\path;
-
 use Mezzio\Application as MezzioApplication;
 use Mezzio\MiddlewareFactoryInterface;
 use Mezzio\Router;
@@ -17,12 +14,13 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Tracy\Debugger;
 
-/** @psalm-import-type MiddlewareParam from MiddlewareFactory */
+use function Laminas\Stratigility\path;
+
+/** @phpstan-ignore class.extendsFinalByPhpDoc */
 class Application extends MezzioApplication
 {
-    use TimerTrait;
-
     public function __construct(
         private MiddlewareFactoryInterface $factory,
         private MiddlewarePipeInterface $pipeline,
@@ -32,13 +30,13 @@ class Application extends MezzioApplication
 
     /**
      * Proxies to composed pipeline to handle.
-     * {@inheritDocs}
+     * {@inheritDoc}
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        static::timer($this::class . '::' . __METHOD__);
+        Debugger::timer($this::class . '::' . __METHOD__);
         $handle = parent::handle($request);
-        static::timer($this::class . '::' . __METHOD__);
+        Debugger::timer($this::class . '::' . __METHOD__);
 
         return $handle;
     }

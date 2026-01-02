@@ -12,7 +12,6 @@ use Webware\Traccio\Debug;
 final class RequestPanelMiddlewareFactory
 {
     /**
-     * @return TracyDebuggerMiddleware
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
      */

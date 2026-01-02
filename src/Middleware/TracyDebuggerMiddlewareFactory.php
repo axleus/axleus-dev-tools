@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Middleware;
 
-use function class_exists;
-
 use Psr\Container\ContainerInterface;
 use Tracy\Debugger;
 use Webware\Traccio\Debug;
+
+use function class_exists;
 
 final class TracyDebuggerMiddlewareFactory
 {
