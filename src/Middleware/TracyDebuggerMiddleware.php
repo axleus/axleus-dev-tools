@@ -31,9 +31,14 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
             if (class_exists(\PhpDb\Adapter\AdapterInterface::class)) {
                 Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             }
-            Debugger::getBar()->addPanel($this->configPanel);
-            Debugger::getBar()->addPanel($this->routesPanel);
 
+            if ($this->configPanel) {
+                Debugger::getBar()->addPanel($this->configPanel);
+            }
+
+            if ($this->routesPanel) {
+                Debugger::getBar()->addPanel($this->routesPanel);
+            }
         }
 
         return $handler->handle($request);
