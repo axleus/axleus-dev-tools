@@ -22,13 +22,7 @@
             "php": "8.2.99"
         },
         "allow-plugins": {
-            "laminas/laminas-component-installer": true,
             "composer/package-versions-deprecated": true
-        }
-    },
-    "extra": {
-        "laminas": {
-            "config-provider": "Webware\\Traccio\\ConfigProvider"
         }
     },
     "require": {

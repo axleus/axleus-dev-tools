@@ -13,7 +13,7 @@ trait IBarPanelTrait
     public function getTab(): string
     {
         return Helpers::capture(function () {
-            $data = $this->data;
+            $data  = $this->data;
             $title = $this->id;
             require __DIR__ . "/panels/{$this->id}.tab.phtml";
         });

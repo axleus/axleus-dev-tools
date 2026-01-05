@@ -20,6 +20,7 @@ use PhpDb\Sql\Ddl\CreateTable;
 use PhpDb\Sql\Sql;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Tracy\IBarPanel;
 use Webware\Traccio\Debug\SqlProfilerPanel;
 use Webware\Traccio\Debug\SqlProfilerPanelFactory;
@@ -45,7 +46,7 @@ final class SqlProfilerPanelTest extends TestCase
         $this->adapter = $this->createAdapter();
 
         // Create the panel
-        $this->panel = new SqlProfilerPanel($this->adapter);
+        $this->panel   = new SqlProfilerPanel($this->adapter);
 
         // Setup test database schema
         $this->createTestSchema();
@@ -62,13 +63,13 @@ final class SqlProfilerPanelTest extends TestCase
         // Force connection now to ensure the database persists
         $connection->connect();
 
-        $statement = new Statement();
-        $result = new Result();
+        $statement  = new Statement();
+        $result     = new Result();
 
-        $driver = new Pdo($connection, $statement, $result, [new SqliteRowCounter()]);
-        $platform = new SqlitePlatform($driver);
+        $driver     = new Pdo($connection, $statement, $result, [new SqliteRowCounter()]);
+        $platform   = new SqlitePlatform($driver);
 
-        $adapter = new Adapter($driver, $platform);
+        $adapter    = new Adapter($driver, $platform);
         $adapter->setProfiler(new Profiler());
 
         return $adapter;
@@ -84,8 +85,8 @@ final class SqlProfilerPanelTest extends TestCase
             ->addColumn(new Varchar('username', 50, false))
             ->addColumn(new Varchar('email', 100, false));
 
-        $sql = new Sql($this->adapter);
-        $sqlString = $sql->buildSqlString($createTable);
+        $sql         = new Sql($this->adapter);
+        $sqlString   = $sql->buildSqlString($createTable);
 
         // Execute the CREATE TABLE statement using EXECUTE mode
         $this->adapter->query($sqlString, Adapter::QUERY_MODE_EXECUTE);
@@ -98,8 +99,8 @@ final class SqlProfilerPanelTest extends TestCase
 
     public function testPanelHasCorrectId(): void
     {
-        $reflection = new \ReflectionClass($this->panel);
-        $property = $reflection->getProperty('id');
+        $reflection = new ReflectionClass($this->panel);
+        $property   = $reflection->getProperty('id');
         $property->setAccessible(true);
         $this->assertSame('database', $property->getValue($this->panel));
     }
@@ -108,7 +109,6 @@ final class SqlProfilerPanelTest extends TestCase
     {
         $tab = $this->panel->getTab();
 
-        $this->assertIsString($tab);
         $this->assertStringContainsString('<svg', $tab);
         $this->assertStringContainsString('tracy-label', $tab);
     }
@@ -117,7 +117,6 @@ final class SqlProfilerPanelTest extends TestCase
     {
         $panel = $this->panel->getPanel();
 
-        $this->assertIsString($panel);
         $this->assertStringContainsString('Query Profiles', $panel);
         $this->assertStringContainsString('tracy-inner', $panel);
         $this->assertStringContainsString('tracy-QueryPanel', $panel);
@@ -128,7 +127,9 @@ final class SqlProfilerPanelTest extends TestCase
         // Execute a test query
         $this->adapter->query('SELECT * FROM users', Adapter::QUERY_MODE_EXECUTE);
 
-        $profiles = $this->adapter->getProfiler()->getProfiles();
+        /** @var Profiler $profiler */
+        $profiler    = $this->adapter->getProfiler();
+        $profiles    = $profiler->getProfiles();
 
         // Should have at least 1 profile (the SELECT), possibly 2 if CREATE TABLE was profiled
         $this->assertGreaterThanOrEqual(1, count($profiles));
@@ -138,6 +139,7 @@ final class SqlProfilerPanelTest extends TestCase
         foreach ($profiles as $profile) {
             if (str_contains($profile['sql'], 'SELECT * FROM users')) {
                 $foundSelect = true;
+
                 break;
             }
         }
@@ -152,7 +154,9 @@ final class SqlProfilerPanelTest extends TestCase
         $this->adapter->query('SELECT * FROM users WHERE username = ?', ['john_doe']);
         $this->adapter->query('UPDATE users SET email = ? WHERE username = ?', ['newemail@example.com', 'john_doe']);
 
-        $profiles = $this->adapter->getProfiler()->getProfiles();
+        /** @var Profiler $profiler */
+        $profiler     = $this->adapter->getProfiler();
+        $profiles     = $profiler->getProfiles();
         // Should have 5 profiles: 1 CREATE TABLE + 2 INSERT + 1 SELECT + 1 UPDATE
         $this->assertCount(5, $profiles);
 
@@ -196,21 +200,21 @@ final class SqlProfilerPanelTest extends TestCase
             ],
         ]);
 
-        $factory = new SqlProfilerPanelFactory();
-        $panel = $factory($container);
+        $factory   = new SqlProfilerPanelFactory();
+        $panel     = $factory($container);
 
         $this->assertInstanceOf(SqlProfilerPanel::class, $panel);
     }
 
     public function testProfilingDelegatorWrapsAdapter(): void
     {
-        $container = new ServiceManager();
+        $container       = new ServiceManager();
 
         // Original factory that creates a basic adapter
-        $originalFactory = fn () => $this->createAdapter();
+        $originalFactory = fn() => $this->createAdapter();
 
         // Apply the profiling delegator
-        $delegator = new ProfilingDelegator();
+        $delegator       = new ProfilingDelegator();
         $profiledAdapter = $delegator($container, AdapterInterface::class, $originalFactory);
 
         $this->assertInstanceOf(AdapterInterface::class, $profiledAdapter);
@@ -219,24 +223,24 @@ final class SqlProfilerPanelTest extends TestCase
 
     public function testProfiledAdapterCapturesQueries(): void
     {
-        $container = new ServiceManager();
+        $container       = new ServiceManager();
 
         $originalFactory = function () {
-            $adapter = $this->createAdapter();
+            $adapter     = $this->createAdapter();
 
             // Setup schema using DDL
             $createTable = new CreateTable('test');
             $createTable->addColumn(new Integer('id', true, null, ['autoincrement' => true]))
                 ->addColumn(new Varchar('name', 255, false));
 
-            $sql = new Sql($adapter);
-            $sqlString = $sql->buildSqlString($createTable);
+            $sql         = new Sql($adapter);
+            $sqlString   = $sql->buildSqlString($createTable);
             $adapter->query($sqlString, Adapter::QUERY_MODE_EXECUTE);
 
             return $adapter;
         };
 
-        $delegator = new ProfilingDelegator();
+        $delegator       = new ProfilingDelegator();
         /** @var Adapter $profiledAdapter */
         $profiledAdapter = $delegator($container, AdapterInterface::class, $originalFactory);
 
@@ -244,14 +248,14 @@ final class SqlProfilerPanelTest extends TestCase
         $profiledAdapter->query('INSERT INTO test (name) VALUES (?)', ['test1']);
         $profiledAdapter->query('SELECT * FROM test', Adapter::QUERY_MODE_EXECUTE);
 
-        $profiles = $profiledAdapter->getProfiler()->getProfiles();
+        $profiles        = $profiledAdapter->getProfiler()->getProfiles();
 
         // Should have 3 profiles (CREATE, INSERT, SELECT)
         $this->assertGreaterThanOrEqual(2, count($profiles));
 
         // Verify queries were captured
-        $foundInsert = false;
-        $foundSelect = false;
+        $foundInsert     = false;
+        $foundSelect     = false;
 
         foreach ($profiles as $profile) {
             if (str_contains($profile['sql'], 'INSERT INTO test')) {
@@ -282,14 +286,14 @@ final class SqlProfilerPanelTest extends TestCase
     public function testSetDataUpdatesAdapterReference(): void
     {
         // Create a second adapter with different queries
-        $newAdapter = $this->createAdapter();
+        $newAdapter   = $this->createAdapter();
 
         // Setup schema using DDL
-        $createTable = new CreateTable('test2');
+        $createTable  = new CreateTable('test2');
         $createTable->addColumn(new Integer('id'));
 
-        $sql = new Sql($newAdapter);
-        $sqlString = $sql->buildSqlString($createTable);
+        $sql          = new Sql($newAdapter);
+        $sqlString    = $sql->buildSqlString($createTable);
         $newAdapter->query($sqlString, Adapter::QUERY_MODE_EXECUTE);
 
         $newAdapter->query('SELECT * FROM test2');
@@ -306,12 +310,11 @@ final class SqlProfilerPanelTest extends TestCase
         // Create a fresh adapter with no queries
         $emptyAdapter = $this->createAdapter();
 
-        $panel = new SqlProfilerPanel($emptyAdapter);
+        $panel        = new SqlProfilerPanel($emptyAdapter);
 
         $panelContent = $panel->getPanel();
 
         // Panel should render without errors even with no profiles
-        $this->assertIsString($panelContent);
         $this->assertStringContainsString('Query Profiles', $panelContent);
     }
 
@@ -319,11 +322,12 @@ final class SqlProfilerPanelTest extends TestCase
     {
         $this->adapter->query(
             'INSERT INTO users (username, email) VALUES (?, ?), (?, ?), (?, ?)',
-            ['user1', 'user1@example.com', 'user2', 'user2@example.com', 'user3', 'user3@example.com']
+            ['user1', 'user1@example.com', 'user2', 'user2@example.com', 'user3', 'user3@example.com'],
         );
-
-        $profiles = $this->adapter->getProfiler()->getProfiles();
-        $lastProfile = $profiles[count($profiles) - 1];
+        /** @var Profiler $profiler */
+        $profiler     = $this->adapter->getProfiler();
+        $profiles     = $profiler->getProfiles();
+        $lastProfile  = $profiles[count($profiles) - 1];
 
         $this->assertStringContainsString('INSERT INTO users', $lastProfile['sql']);
         $this->assertCount(6, $lastProfile['parameters']->getNamedArray());

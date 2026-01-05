@@ -27,7 +27,18 @@ return (new Config())
         'list_syntax' => ['syntax' => 'short'],
         // Operators
         'logical_operators' => true,
-        'binary_operator_spaces' => ['operators' => ['=>' => 'align_single_space_minimal_by_scope']],
+        'binary_operator_spaces' => [
+            'operators' => [
+                '=>'  => 'align_single_space_minimal_by_scope',
+                '|'   => 'no_space',
+                '&'   => 'no_space',
+                '='   => 'align_single_space_minimal_by_scope',
+                '+='  => 'align_single_space_minimal_by_scope',
+                '-='  => 'align_single_space_minimal_by_scope',
+                '*='  => 'align_single_space_minimal_by_scope',
+                '===' => 'align_single_space_minimal_by_scope',
+            ]
+        ],
         'assign_null_coalescing_to_coalesce_equal' => true,
         'no_useless_nullsafe_operator' => true,
         'not_operator_with_successor_space' => true,
@@ -93,5 +104,4 @@ return (new Config())
             // 💡 extra configs
             // ->ignoreDotFiles(false) // true by default in v3, false in v4 or future mode
             // ->ignoreVCS(true) // true by default
-    )
-;
+    );

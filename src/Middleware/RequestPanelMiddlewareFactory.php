@@ -18,7 +18,7 @@ final class RequestPanelMiddlewareFactory
     public function __invoke(ContainerInterface $container): RequestPanelMiddleware
     {
         /** @var bool */
-        $debug = $container->get('config')['debug'];
+        $debug    = $container->get('config')['debug'];
         /** @var bool */
         $override = $container->get('config')['debug_overrides']['show_debugger_in_production'];
 

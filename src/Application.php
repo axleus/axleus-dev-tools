@@ -83,7 +83,7 @@ class Application extends MezzioApplication
     public function pipe($middlewareOrPath, $middleware = null): void
     {
         $middleware ??= $middlewareOrPath;
-        $path = $middleware === $middlewareOrPath ? '/' : $middlewareOrPath;
+        $path       = $middleware === $middlewareOrPath ? '/' : $middlewareOrPath;
 
         $middleware = $path !== '/'
             ? path($path, $this->factory->prepare($middleware))
