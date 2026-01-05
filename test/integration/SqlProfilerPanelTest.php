@@ -248,7 +248,9 @@ final class SqlProfilerPanelTest extends TestCase
         $profiledAdapter->query('INSERT INTO test (name) VALUES (?)', ['test1']);
         $profiledAdapter->query('SELECT * FROM test', Adapter::QUERY_MODE_EXECUTE);
 
-        $profiles        = $profiledAdapter->getProfiler()->getProfiles();
+        /** @var Profiler $profiler */
+        $profiler        = $profiledAdapter->getProfiler();
+        $profiles        = $profiler->getProfiles();
 
         // Should have 3 profiles (CREATE, INSERT, SELECT)
         $this->assertGreaterThanOrEqual(2, count($profiles));
