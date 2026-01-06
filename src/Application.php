@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Webware Traccio component.
+ *
+ * Copyright (c) 2023-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Webware\Traccio;
 
 use Laminas\HttpHandlerRunner\RequestHandlerRunnerInterface;
@@ -77,6 +87,7 @@ class Application extends MezzioApplication
      * @param array|callable|MiddlewareInterface|RequestHandlerInterface|string|null $middleware
      *                                                                                           If present, middleware or request handler to segregate by the path
      *                                                                                           specified in $middlewareOrPath
+     *
      * @psalm-param string|MiddlewareParam $middlewareOrPath
      * @psalm-param null|MiddlewareParam $middleware
      */

@@ -10,13 +10,14 @@
          failOnDeprecation="true"
          failOnWarning="true">
 
-    <testsuite name="unit test">
-        <directory>./test/unit</directory>
-    </testsuite>
-
-    <testsuite name="integration test">
-        <directory>./test/integration</directory>
-    </testsuite>
+    <testsuites>
+        <testsuite name="unit test">
+            <directory>./test/unit</directory>
+        </testsuite>
+        <testsuite name="integration test">
+            <directory>./test/integration</directory>
+        </testsuite>
+    </testsuites>
     <source restrictNotices="true">
         <include>
             <directory suffix=".php">src</directory>

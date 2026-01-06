@@ -22,13 +22,7 @@
             "php": "8.2.99"
         },
         "allow-plugins": {
-            "laminas/laminas-component-installer": true,
             "composer/package-versions-deprecated": true
-        }
-    },
-    "extra": {
-        "laminas": {
-            "config-provider": "Webware\\Traccio\\ConfigProvider"
         }
     },
     "require": {
@@ -36,14 +30,14 @@
         "tracy/tracy": "^2.11.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.92.3",
         "laminas/laminas-diactoros": "^3.8",
         "php-db/phpdb-adapter-sqlite": "^0.2.0",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^11.5.42",
         "mezzio/mezzio": "^3.26",
-        "roave/security-advisories": "dev-master"
+        "roave/security-advisories": "dev-master",
+        "webware/coding-standard": "^0.1.0"
     },
     "autoload": {
         "psr-4": {

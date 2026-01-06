@@ -49,13 +49,20 @@ use Tracy\Helpers;
                             <td colspan="2">Parameters:</td>
                         </tr>
                         <?php
-                        foreach ($profile['parameters']->getNamedArray() as $position => $value): ?>
+                        if ($profile['parameters'] !== null):
+                            foreach ($profile['parameters']->getNamedArray() as $position => $value): ?>
                         <tr>
                             <td><?=$position?></td>
                             <td><?=$value?></td>
                         </tr>
                         <?php
-                        endforeach; ?>
+                            endforeach;
+                        else: ?>
+                        <tr>
+                            <td colspan="2"><em>No parameters</em></td>
+                        </tr>
+                        <?php
+                        endif; ?>
                     </tbody>
                 </table>
             </div>

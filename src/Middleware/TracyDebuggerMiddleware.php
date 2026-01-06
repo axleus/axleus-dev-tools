@@ -2,8 +2,19 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Webware Traccio component.
+ *
+ * Copyright (c) 2023-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Webware\Traccio\Middleware;
 
+use PhpDb\Adapter\AdapterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -13,6 +24,8 @@ use Webware\Traccio\Debug;
 
 class TracyDebuggerMiddleware implements MiddlewareInterface
 {
+    public final const ENABLE_KEY = 'enable';
+
     public function __construct(
         private bool $debug,
         private array $tracyConfig,
@@ -25,15 +38,24 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
     {
         if ($this->debug) {
             foreach ($this->tracyConfig as $key => $value) {
+                if ($key === self::ENABLE_KEY) {
+                    Debugger::enable($value);
+                    continue;
+                }
                 Debugger::${$key} = $value;
             }
 
-            if (class_exists(\PhpDb\Adapter\AdapterInterface::class)) {
+            if (class_exists(AdapterInterface::class)) {
                 Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             }
-            Debugger::getBar()->addPanel($this->configPanel);
-            Debugger::getBar()->addPanel($this->routesPanel);
 
+            if ($this->configPanel) {
+                Debugger::getBar()->addPanel($this->configPanel);
+            }
+
+            if ($this->routesPanel) {
+                Debugger::getBar()->addPanel($this->routesPanel);
+            }
         }
 
         return $handler->handle($request);
