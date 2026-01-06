@@ -2,8 +2,19 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the Webware Traccio component.
+ *
+ * Copyright (c) 2023-2026 Joey Smith <jsmith@webinertia.net>
+ * and contributors.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Webware\Traccio\Middleware;
 
+use PhpDb\Adapter\AdapterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -28,7 +39,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
                 Debugger::${$key} = $value;
             }
 
-            if (class_exists(\PhpDb\Adapter\AdapterInterface::class)) {
+            if (class_exists(AdapterInterface::class)) {
                 Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             }
 
