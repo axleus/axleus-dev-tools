@@ -24,6 +24,8 @@ use Webware\Traccio\Debug;
 
 class TracyDebuggerMiddleware implements MiddlewareInterface
 {
+    public final const ENABLE_KEY = 'enable';
+
     public function __construct(
         private bool $debug,
         private array $tracyConfig,
@@ -36,6 +38,10 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
     {
         if ($this->debug) {
             foreach ($this->tracyConfig as $key => $value) {
+                if ($key === self::ENABLE_KEY) {
+                    Debugger::enable($value);
+                    continue;
+                }
                 Debugger::${$key} = $value;
             }
 
