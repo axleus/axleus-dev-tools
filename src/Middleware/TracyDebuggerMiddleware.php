@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Middleware;
 
-use PhpDb\Adapter\AdapterInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -24,11 +23,12 @@ use Webware\Traccio\Debug;
 
 class TracyDebuggerMiddleware implements MiddlewareInterface
 {
-    public final const ENABLE_KEY = 'enable';
+    final public const ENABLE_KEY = 'enable';
 
     public function __construct(
         private bool $debug,
         private array $tracyConfig,
+        private bool $enableSqlProfiler,
         private ?Debug\ConfigPanel $configPanel,
         private ?Debug\SqlProfilerPanel $sqlProfilerPanel,
         private ?Debug\RoutesPanel $routesPanel,
@@ -40,12 +40,13 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
             foreach ($this->tracyConfig as $key => $value) {
                 if ($key === self::ENABLE_KEY) {
                     Debugger::enable($value);
+
                     continue;
                 }
                 Debugger::${$key} = $value;
             }
 
-            if (class_exists(AdapterInterface::class)) {
+            if ($this->enableSqlProfiler && $this->sqlProfilerPanel) {
                 Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             }
 
