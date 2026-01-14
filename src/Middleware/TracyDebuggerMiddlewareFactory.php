@@ -24,6 +24,7 @@ final class TracyDebuggerMiddlewareFactory
     public function __invoke(ContainerInterface $container): TracyDebuggerMiddleware
     {
         $hasProfiler = $container->has(ProfilerInterface::class);
+
         return new TracyDebuggerMiddleware(
             $container->get('config')['debug'],
             $container->get('config')[Debugger::class],
