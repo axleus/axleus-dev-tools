@@ -29,6 +29,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
     public function __construct(
         private bool $debug,
         private array $tracyConfig,
+        private bool $enableSqlProfiler,
         private ?Debug\ConfigPanel $configPanel,
         private ?Debug\SqlProfilerPanel $sqlProfilerPanel,
         private ?Debug\RoutesPanel $routesPanel,
@@ -45,7 +46,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
                 Debugger::${$key} = $value;
             }
 
-            if (class_exists(AdapterInterface::class)) {
+            if ($this->enableSqlProfiler && $this->sqlProfilerPanel) {
                 Debugger::getBar()->addPanel($this->sqlProfilerPanel);
             }
 
