@@ -29,7 +29,6 @@ return (new Config())
             [
                 'header_comment' => [
                     'header'   => $fileHeader,
-                    'separate' => 'both',
                     'location' => 'after_declare_strict',
                     'separate' => 'both',
                 ],
