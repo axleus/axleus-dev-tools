@@ -21,14 +21,14 @@ use PhpDb\Adapter\Driver\Pdo\Result;
 use PhpDb\Adapter\Driver\Pdo\Statement;
 use PhpDb\Adapter\Profiler\Profiler;
 use PhpDb\Adapter\Profiler\ProfilerAwareInterface;
-use PhpDb\Adapter\Sqlite\Driver\Pdo\Connection;
-use PhpDb\Adapter\Sqlite\Driver\Pdo\Feature\SqliteRowCounter;
-use PhpDb\Adapter\Sqlite\Driver\Pdo\Pdo;
-use PhpDb\Adapter\Sqlite\Platform\Sqlite as SqlitePlatform;
 use PhpDb\Sql\Ddl\Column\Integer;
 use PhpDb\Sql\Ddl\Column\Varchar;
 use PhpDb\Sql\Ddl\CreateTable;
 use PhpDb\Sql\Sql;
+use PhpDb\Sqlite\AdapterPlatform;
+use PhpDb\Sqlite\Pdo\Connection;
+use PhpDb\Sqlite\Pdo\Driver;
+use PhpDb\Sqlite\Pdo\Feature\SqliteRowCounter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -327,8 +327,8 @@ final class SqlProfilerPanelTest extends TestCase
         $statement = new Statement();
         $result    = new Result();
 
-        $driver   = new Pdo($connection, $statement, $result, [new SqliteRowCounter()]);
-        $platform = new SqlitePlatform($driver);
+        $driver   = new Driver($connection, $statement, $result, [new SqliteRowCounter()]);
+        $platform = new AdapterPlatform($driver);
 
         $adapter = new Adapter($driver, $platform);
         $adapter->setProfiler(new Profiler());
