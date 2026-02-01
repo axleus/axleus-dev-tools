@@ -30,6 +30,8 @@
         "tracy/tracy": "^2.11.0"
     },
     "require-dev": {
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
         "laminas/laminas-diactoros": "^3.8",
         "php-db/phpdb-sqlite": "^0.2.0",
         "phpstan/phpstan": "^2.1",
