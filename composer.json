@@ -31,7 +31,7 @@
     },
     "require-dev": {
         "laminas/laminas-diactoros": "^3.8",
-        "php-db/phpdb-adapter-sqlite": "^0.2.0",
+        "php-db/phpdb-sqlite": "^0.2.0",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^11.5.42",
