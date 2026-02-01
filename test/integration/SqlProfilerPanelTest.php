@@ -71,7 +71,6 @@ final class SqlProfilerPanelTest extends TestCase
     {
         $reflection = new ReflectionClass($this->panel);
         $property   = $reflection->getProperty('id');
-        $property->setAccessible(true);
         $this->assertSame('database', $property->getValue($this->panel));
     }
 
