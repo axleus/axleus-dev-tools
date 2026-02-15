@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Debug;
 
-use Mezzio\Router\RouteCollector;
+use Mezzio\Router\RouteCollectorInterface;
 use Tracy\IBarPanel;
 
 final class RoutesPanel implements IBarPanel
@@ -22,7 +22,7 @@ final class RoutesPanel implements IBarPanel
     use IBarPanelTrait;
 
     public function __construct(
-        private RouteCollector $data,
+        private RouteCollectorInterface $data,
     ) {
         $this->id = 'routes';
     }
