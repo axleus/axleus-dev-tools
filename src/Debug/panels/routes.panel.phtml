@@ -12,11 +12,17 @@ if(! $data instanceof RouteCollectorInterface) {
     return;
 }
 
-Dumper::renderAssets();
-Debugger::$maxLength = 250;
 ?>
 <div class="tracy-inner tracy-QueryPanel">
     <div class="tracy-inner-container">
-        <?php Dumper::dump($data->getRoutes());?>
+        <?= Dumper::toHtml($data->getRoutes(), [
+            Dumper::DEPTH => Debugger::$maxDepth,
+            Dumper::ITEMS => Debugger::$maxItems,
+            Dumper::TRUNCATE => Debugger::$maxLength,
+            Dumper::LOCATION => Debugger::$showLocation ?: Dumper::LOCATION_CLASS | Dumper::LOCATION_SOURCE,
+            Dumper::KEYS_TO_HIDE => Debugger::$keysToHide,
+            Dumper::THEME => Debugger::$dumpTheme,
+            Dumper::LAZY => true,
+        ]) ?>
     </div>
 </div>
