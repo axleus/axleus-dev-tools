@@ -16,15 +16,7 @@
 
 ### Core Components
 
-#### 1. Application Class (`src/Application.php`)
-- **Extends**: `Mezzio\Application` (ignores final by phpstan)
-- **Purpose**: Enhanced application class with Tracy timer integration
-- **Key Features**:
-  - Wraps `handle()` method with `Debugger::timer()` for performance tracking
-  - Maintains full compatibility with Mezzio's middleware pipeline
-  - Constructor injects: `MiddlewareFactoryInterface`, `MiddlewarePipeInterface`, `RouteCollectorInterface`, `RequestHandlerRunnerInterface`
-
-#### 2. ConfigProvider (`src/ConfigProvider.php`)
+#### ConfigProvider (`src/ConfigProvider.php`)
 - **Purpose**: Laminas component installer configuration provider
 - **Provides**:
   - Service factory definitions
@@ -40,9 +32,10 @@ Each panel consists of three components:
 
 1. **Panel Class** (e.g., `RoutesPanel.php`):
    - Implements `Tracy\IBarPanel` interface
-   - Uses `IBarPanelTrait` for common functionality
+   - Uses `IBarPanelTrait` for common rendering logic (most panels)
    - Constructor receives typed data dependency
    - Has a unique `$id` property matching panel name
+   - Complex panels (e.g., `SqlProfilerPanel`) override `getTab()` and `getPanel()` directly when they need to pre-process data before passing it to the template
 
 2. **Factory Class** (e.g., `RoutesPanelFactory.php`):
    - Resolves dependencies from PSR-11 container
@@ -54,11 +47,14 @@ Each panel consists of three components:
 
 #### IBarPanelTrait (`src/Debug/IBarPanelTrait.php`)
 - **Purpose**: Provides common panel rendering logic
+- **Variables injected into templates**:
+  - `getTab()` injects `$data` (raw panel data) and `$title` (the panel `$id` string)
+  - `getPanel()` injects `$data` (raw panel data)
 - **Methods**:
-  - `getTab()`: Renders tab using `{$id}.tab.phtml` template
-  - `getPanel()`: Renders panel content using `{$id}.panel.phtml` template
+  - `getTab()`: Wraps template require in `Tracy\Helpers::capture()`, injects `$data` and `$title`
+  - `getPanel()`: Wraps template require in `Tracy\Helpers::capture()`, injects `$data`
   - `setData($data)`: Updates panel data dynamically
-- **Uses**: `Tracy\Helpers::capture()` for output buffering
+- **Override pattern**: When a panel needs to transform or aggregate data before rendering (e.g., database profiling), override `getTab()` and `getPanel()` directly in the panel class and inject pre-computed variables rather than raw data
 
 ### Existing Debug Panels
 
@@ -83,9 +79,50 @@ Each panel consists of three components:
 #### 4. SqlProfilerPanel (`src/Debug/SqlProfilerPanel.php`)
 - **ID**: `database`
 - **Data**: `AdapterInterface` (PhpDb) - Database adapter with profiler
-- **Purpose**: Display SQL query profiling information
-- **Factory**: Conditional - only registered when `PhpDb\Adapter\AdapterInterface` exists
-- **Dependency**: Requires `php-db/phpdb` and profiling delegator
+- **Purpose**: Display grouped SQL query profiling information with timing and parameters
+- **Rendering**: Overrides `getTab()` and `getPanel()` directly — does NOT rely on the trait's default implementations
+- **Key behaviour**:
+  - Uses `instanceof PhpDb\Adapter\Profiler\Profiler` guard before calling `getProfiles()`, because `getProfiles()` is only on the concrete `Profiler` class, not on `ProfilerInterface`
+  - Delegates raw profile aggregation to `ProfilerDataFormatter`
+  - Injects pre-computed `$count` (int) and `$total` (float, seconds) into the tab template
+  - Injects formatted `$data` array (`['summary' => [...], 'groups' => [...]]`) into the panel template
+- **Factory**: Conditional - only registered when `PhpDb\Adapter\ProfilerInterface` is available in the container
+
+#### ProfilerDataFormatter (`src/Debug/ProfilerDataFormatter.php`)
+- **Purpose**: Pure aggregation utility — no framework dependencies
+- **Method**: `format(array $profiles): array`
+  - Accepts raw entries from `Profiler::getProfiles()`
+  - Skips profiles with `null` elapse (still-open / prepare-only queries)
+  - Groups identical SQL statements, computing count, total/avg/slowest per group
+  - Sorts groups by `total_elapsed` descending
+  - Returns:
+    ```php
+    [
+        'summary' => [
+            'total_queries'     => int,
+            'unique_statements' => int,
+            'total_elapsed'     => float,  // seconds
+            'slowest_elapsed'   => float,  // seconds
+        ],
+        'groups' => [
+            [
+                'sql'           => string,
+                'count'         => int,
+                'total_elapsed' => float,
+                'avg_elapsed'   => float,
+                'slowest'       => float,
+                'executions'    => [
+                    [
+                        'index'      => int,    // original profile index
+                        'start'      => float,  // Unix timestamp with microseconds
+                        'elapsed'    => float,  // seconds
+                        'parameters' => ?ParameterContainer,
+                    ],
+                ],
+            ],
+        ],
+    ]
+    ```
 
 ### Middleware
 
@@ -94,13 +131,14 @@ Each panel consists of three components:
 - **Constructor Parameters**:
   - `bool $debug` - Whether debug mode is enabled
   - `array $tracyConfig` - Tracy configuration (theme, keys to hide, etc.)
+  - `bool $enableSqlProfiler` - Whether to add the SQL profiler panel to the bar
   - `?ConfigPanel $configPanel` - Optional config panel
   - `?SqlProfilerPanel $sqlProfilerPanel` - Optional database panel
   - `?RoutesPanel $routesPanel` - Optional routes panel
 - **Process Flow**:
   1. Check if debug mode is enabled
-  2. Apply Tracy configuration (set Debugger properties dynamically)
-  3. Add panels to Tracy bar if available
+  2. Apply Tracy configuration (set Debugger static properties dynamically)
+  3. Add panels to Tracy bar based on availability and `$enableSqlProfiler` flag
   4. Pass request to next handler
 
 #### TracyDebuggerMiddlewareFactory (`src/Middleware/TracyDebuggerMiddlewareFactory.php`)
@@ -108,29 +146,32 @@ Each panel consists of three components:
 - **Logic**:
   - Retrieves `debug` flag from config
   - Retrieves Tracy configuration from `config[Debugger::class]`
-  - Conditionally resolves panels based on container availability
-  - SQL profiler panel only created if PhpDb adapter class exists
+  - Sets `$enableSqlProfiler` to `true` when `PhpDb\Adapter\Profiler\ProfilerInterface` is in the container
+  - Conditionally resolves each panel; passes `null` when not available
 
 #### RequestPanelMiddleware (`src/Middleware/RequestPanelMiddleware.php`)
-- **Purpose**: Inject current request into RequestPanel after routing
+- **Purpose**: Inject the resolved PSR-7 request into `RequestPanel` after routing
+- **Placement**: Must be piped **after** routing middleware so the fully-resolved request is available
 - **Factory**: `RequestPanelMiddlewareFactory`
 
 ### Database Profiling Integration
 
 #### ProfilingDelegator (`src/PhpDb/ProfilingDelegator.php`)
-- **Purpose**: Wrap PhpDb adapter with profiler
-- **Type**: Service manager delegator
+- **Purpose**: Wrap a PhpDb adapter with a `Profiler` instance
+- **Type**: Laminas service manager delegator factory
 - **Process**:
-  1. Calls original factory to get adapter
-  2. Attaches `PhpDb\Adapter\Profiler\Profiler` to adapter
-  3. Returns profiler-enabled adapter
-- **Activation**: Uncomment delegator configuration in `ConfigProvider::getDependencies()`
+  1. Calls the original factory callback to get the adapter
+  2. Creates a `new PhpDb\Adapter\Profiler\Profiler()` and attaches it via `setProfiler()`
+  3. Returns the profiler-enabled adapter
+- **Activation**: Add the delegator to your application config (it is commented out in `ConfigProvider` by default)
 
 ## Development Patterns
 
 ### Creating a New Debug Panel
 
-Follow this pattern when adding new debug panels:
+#### Simple panel (uses IBarPanelTrait rendering)
+
+Use this when the template can work directly with the raw data dependency — no pre-processing needed.
 
 1. **Create Panel Class** (`src/Debug/{Name}Panel.php`):
 ```php
@@ -185,13 +226,37 @@ final class {Name}PanelFactory
 ```
 
 5. **Add to Middleware** (if needed):
-   - Update `TracyDebuggerMiddleware` constructor to accept panel
-   - Update `TracyDebuggerMiddlewareFactory` to resolve panel
-   - Add panel to Tracy bar in middleware `process()` method
+   - Add a constructor parameter to `TracyDebuggerMiddleware`
+   - Resolve it conditionally in `TracyDebuggerMiddlewareFactory`
+   - Call `Debugger::getBar()->addPanel(...)` in the middleware `process()` method
+
+#### Complex panel (overrides getTab / getPanel)
+
+Use this when the panel must aggregate, transform, or guard data before rendering — for example when the raw dependency is a service object rather than a plain data structure.
+
+Override both methods using `Tracy\Helpers::capture()` and inject only the variables the template needs:
+
+```php
+public function getTab(): string
+{
+    return Helpers::capture(function () {
+        // compute $varA, $varB from $this->data
+        require __DIR__ . '/panels/{panel-id}.tab.phtml';
+    });
+}
+
+public function getPanel(): string
+{
+    return Helpers::capture(function () {
+        // compute $data from $this->data
+        require __DIR__ . '/panels/{panel-id}.panel.phtml';
+    });
+}
+```
 
 ### Panel Template Guidelines
 
-#### Tab Template Pattern:
+#### Tab Template Pattern (IBarPanelTrait — receives `$data` and `$title`):
 ```php
 <?php
 declare(strict_types=1);
@@ -203,19 +268,32 @@ if (!isset($data)) {
 }
 ?>
 <svg viewBox="0 0 640 512">
-    <!-- FontAwesome or custom SVG icon -->
+    <!-- SVG path -->
 </svg>
-<span class="tracy-label"><?=isset($title) ? $title : 'Panel Name'?></span>
+<span class="tracy-label"><?= isset($title) ? $title : 'Panel Name' ?></span>
 ```
 
-#### Panel Template Pattern:
+#### Tab Template Pattern (overridden getTab — receives pre-computed scalars):
 ```php
 <?php
 declare(strict_types=1);
 
 namespace Webware\Traccio\Debug;
 
-use Tracy\Debugger;
+// Variables injected directly by the panel class, e.g. $count (int), $total (float seconds)
+$timeStr = ($total ?? 0.0) > 0.0 ? sprintf(' / %.1f ms', ($total ?? 0.0) * 1000) : '';
+?>
+<svg viewBox="..."><!-- icon --></svg>
+<span class="tracy-label"><?= 'Label: ' . ($count ?? '0') . $timeStr ?></span>
+```
+
+#### Panel Template Pattern (IBarPanelTrait — receives raw `$data`):
+```php
+<?php
+declare(strict_types=1);
+
+namespace Webware\Traccio\Debug;
+
 use Tracy\Dumper;
 
 if (!$data instanceof {ExpectedType}) {
@@ -223,17 +301,66 @@ if (!$data instanceof {ExpectedType}) {
 }
 
 Dumper::renderAssets();
-Debugger::$maxLength = 250; // Adjust as needed
 ?>
 <div class="tracy-inner tracy-{CustomClass}">
     <div class="tracy-inner-container">
-        <?php
-        // Use Tracy\Dumper::dump() for complex data
-        // Or custom HTML for structured display
-        ?>
+        <?php Dumper::dump($data); ?>
     </div>
 </div>
 ```
+
+#### Panel Template Pattern (overridden getPanel — receives pre-processed `$data` array):
+```php
+<?php
+declare(strict_types=1);
+
+namespace Webware\Traccio\Debug;
+
+use Tracy\Helpers;
+
+// $data is an array produced by a formatter/aggregator, e.g.:
+// $summary = $data['summary'];
+// $groups  = $data['groups'];
+```
+
+#### CSS Override Guidelines
+
+Tracy ships its own `bar.css` that sets light-theme defaults for all panels:
+- `#tracy-debug table { background: #FDF5CE }` (yellowish)
+- `#tracy-debug td, th { border: 1px solid #E6DFBF }`
+- `#tracy-debug .tracy-panel { background: white; color: #333 }`
+- `#tracy-debug th { background: #F4F3F1; color: #655E5E }`
+
+When a panel uses custom styling (e.g., a dark theme), these must be explicitly overridden. Always scope custom rules to the panel's root class for sufficient specificity, and set `background` on every `td`/`th` variant:
+
+```html
+<style class="tracy-debug">
+    #tracy-debug .tracy-{CustomClass} { background: #1e1e1e; color: #d0d0d0; }
+    #tracy-debug .tracy-{CustomClass} table { background: transparent; }
+    #tracy-debug .tracy-{CustomClass} td,
+    #tracy-debug .tracy-{CustomClass} th { border-color: #444; color: #d0d0d0; }
+    #tracy-debug .tracy-{CustomClass} tr:nth-child(2n) td { background: rgba(255,255,255,.03); }
+    /* override th background explicitly */
+    #tracy-debug .tracy-{CustomClass} th { background: #333; }
+</style>
+```
+
+Attach the `<style>` block at the top of the panel template with the `class="tracy-debug"` attribute so Tracy includes it in the bar's stylesheet injection.
+
+### Parameter Token Display (SQL panels)
+
+`PhpDb\Adapter\ParameterContainer::getNamedArray()` stores keys as:
+- Positional `?` parameters: string integer keys `"0"`, `"1"`, …
+- Named parameters (e.g., `:C_1`, `:name`): string keys **without** the leading colon — `"C_1"`, `"name"`
+
+To display the original token as used in the SQL string:
+```php
+$token = is_numeric($k) ? '?' . ((int) $k + 1) : ':' . ltrim((string) $k, ':');
+```
+
+This produces `?1`, `?2` for positional and `:C_1`, `:name` for named parameters.
+
+> **Important:** Only queries that complete a full prepare + execute cycle produce finished profiler entries (non-null `elapse`). Calling `query($sql)` without parameters returns a `Statement` object and never calls `profilerFinish()` — such entries will have `elapse === null` and are skipped by `ProfilerDataFormatter`.
 
 ## Configuration
 
@@ -252,24 +379,29 @@ return [
             'token',
             'api_key',
         ],
-        // Additional Tracy options
-        'maxDepth' => 10,
-        'maxLength' => 250,
+        // Any public static property on Tracy\Debugger can be set here
+        'maxDepth'     => 10,
+        'maxLength'    => 250,
         'showLocation' => true,
     ],
 ];
 ```
 
 ### Enabling Database Profiling:
-In your application's `ConfigProvider` or config file:
+In your application's config file or a `ConfigProvider`:
 ```php
-'dependencies' => [
-    'delegators' => [
-        \PhpDb\Adapter\AdapterInterface::class => [
-            \Webware\Traccio\PhpDb\ProfilingDelegator::class,
+use PhpDb\Adapter\AdapterInterface;
+use Webware\Traccio\PhpDb\ProfilingDelegator;
+
+return [
+    'dependencies' => [
+        'delegators' => [
+            AdapterInterface::class => [
+                ProfilingDelegator::class,
+            ],
         ],
     ],
-],
+];
 ```
 
 ## Testing
@@ -278,21 +410,26 @@ In your application's `ConfigProvider` or config file:
 - **Unit Tests**: `test/unit/` (namespace: `WebwareTest\Traccio`)
 - **Integration Tests**: `test/integration/` (namespace: `WebwareIntegrationTest\Traccio`)
 - **Test Assets**: `test/asset/` (namespace: `WebwareTestAsset\Traccio`)
+- **Visual Reference**: `test/asset/panel-preview.html` — static HTML demonstrating panel layout with Tracy's actual conflicting CSS included to verify override specificity
 
 ### Running Tests
 ```bash
 composer test              # Unit tests only
 composer test-integration  # Integration tests
-composer check            # Full check (cs-check, static analysis, all tests)
+composer check             # Full check (cs-check, static analysis, all tests)
 ```
 
 ### Code Quality
 ```bash
-composer cs-check         # Check code style
-composer cs-fix          # Fix code style
-composer sa              # Static analysis with PHPStan
-composer sa-verbose      # Verbose static analysis
+composer cs-check          # Check code style
+composer cs-fix            # Fix code style
+composer sa                # Static analysis with PHPStan
+composer sa-verbose        # Verbose static analysis
 ```
+
+### Integration Test Notes
+- Integration tests for `SqlProfilerPanel` use an in-memory SQLite adapter
+- Queries **must** use the prepare+execute path (pass a parameter array) to produce finished profiler entries; `query($sql)` alone (prepare-only) leaves `elapse === null` and is invisible to the panel
 
 ## Dependencies
 
@@ -305,10 +442,8 @@ composer sa-verbose      # Verbose static analysis
 - `laminas/laminas-diactoros`: ^3.8 (PSR-7 implementation)
 - `phpunit/phpunit`: ^11.5
 - `phpstan/phpstan`: ^2.1
-- `friendsofphp/php-cs-fixer`: ^3.92
-
-### Optional
-- `php-db/phpdb-adapter-sqlite`: ^0.2.0 (for database profiling demo)
+- `webware/coding-standard`: ^0.1.0 (code style)
+- `php-db/phpdb-sqlite`: ^0.2.0 (SQLite adapter for integration tests)
 
 ## Coding Standards
 
@@ -322,37 +457,21 @@ composer sa-verbose      # Verbose static analysis
 - **Strict Types**: All files use `declare(strict_types=1);`
 - **Final Classes**: Use `final` keyword for classes that shouldn't be extended
 - **Type Hints**: Full type declarations on all properties, parameters, and returns
-- **Readonly Pattern**: Constructor property promotion with `private` visibility
+- **Constructor Promotion**: Use `private` constructor property promotion
 
 ### PHPStan Configuration
-- **Level**: Maximum strictness
-- **Ignores**:
-  - `class.extendsFinalByPhpDoc` for Application extending final MezzioApplication
+- **Level**: 5 (configured in `phpstan.neon.dist`)
+- **Stubs**: Custom stubs in `stubs/` for Laminas ServiceManager and PSR Container
 - **Baseline**: `phpstan-baseline.neon` for known/acceptable issues
 
 ## Key Integration Points
 
 ### Mezzio Application Bootstrap
 ```php
-// In config/pipeline.php or similar
+// In config/pipeline.php
 $app->pipe(\Webware\Traccio\Middleware\TracyDebuggerMiddleware::class);
-// ... other middleware
+// ... error handler, routing, ...
 $app->pipe(\Webware\Traccio\Middleware\RequestPanelMiddleware::class);
-```
-
-### Custom Application Factory
-Replace Mezzio's default application factory in `dependencies.php`:
-```php
-use Mezzio\Application;
-use Webware\Traccio\Container\ApplicationFactory;
-
-return [
-    'dependencies' => [
-        'factories' => [
-            Application::class => ApplicationFactory::class,
-        ],
-    ],
-];
 ```
 
 ## Extension Opportunities
@@ -377,8 +496,10 @@ return [
 - Database profiling requires explicit delegator configuration
 - Tracy debugger only activates when `config['debug'] === true`
 - All panels are optional and conditionally registered
-- Use `Tracy\Dumper` for rendering complex data structures
-- SVG icons in tabs should use Tracy's color scheme (`#7a86b8`)
+- `getProfiles()` is only on the concrete `PhpDb\Adapter\Profiler\Profiler` class, not on `ProfilerInterface` — always guard with `instanceof Profiler` before calling it
+- Use `Tracy\Dumper` for rendering complex data structures in panel templates
+- SVG icons in tabs should use Tracy's colour scheme (`#7a86b8`)
+- Tracy's default `bar.css` applies light-theme table styles to all panels — always scope custom CSS overrides to a panel-specific class for sufficient specificity
 
 ## Maintenance
 

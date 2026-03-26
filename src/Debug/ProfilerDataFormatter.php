@@ -28,7 +28,7 @@ final class ProfilerDataFormatter
      * Profiles with a null elapse value (still-open queries) are skipped.
      * Groups are sorted by total elapsed time descending.
      *
-     * @param  array $profiles Raw entries from ProfilerInterface::getProfiles()
+     * @param array $profiles Raw entries from ProfilerInterface::getProfiles()
      * @return array{
      *   summary: array{total_queries: int, unique_statements: int, total_elapsed: float, slowest_elapsed: float},
      *   groups: list<array{sql: string, count: int, total_elapsed: float, avg_elapsed: float, slowest: float, executions: list<array{index: int, start: float, elapsed: float, parameters: ParameterContainer|null}>}>
@@ -101,7 +101,7 @@ final class ProfilerDataFormatter
                 'total_elapsed'     => $totalElapsed,
                 'slowest_elapsed'   => $slowestElapsed,
             ],
-            'groups' => $groups,
+            'groups'  => $groups,
         ];
     }
 }
