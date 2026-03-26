@@ -371,7 +371,8 @@ final class SqlProfilerPanelTest extends TestCase
         // In SQLite, INTEGER PRIMARY KEY is automatically auto-incrementing
         $createTable = new CreateTable('users');
 
-        $createTable->addColumn(new Integer('id', true, null, ['auto_increment' => true]))
+        $id          = new Integer(name: 'id', options: ['auto_increment' => true]);
+        $createTable->addColumn($id)
             ->addColumn(new Varchar('username', 50, false))
             ->addColumn(new Varchar('email', 100, false));
 
