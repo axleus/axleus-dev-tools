@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace Webware\Traccio\Debug;
 
 use PhpDb\Adapter\AdapterInterface;
+use PhpDb\Adapter\Profiler\Profiler;
+use Tracy\Helpers;
 use Tracy\IBarPanel;
 
 final class SqlProfilerPanel implements IBarPanel
@@ -25,5 +27,27 @@ final class SqlProfilerPanel implements IBarPanel
         private AdapterInterface $data,
     ) {
         $this->id = 'database';
+    }
+
+    public function getTab(): string
+    {
+        return Helpers::capture(function () {
+            $profiler = $this->data->getProfiler();
+            $profiles = $profiler instanceof Profiler ? $profiler->getProfiles() : [];
+            $summary  = (new ProfilerDataFormatter())->format($profiles)['summary'];
+            $count    = $summary['total_queries'];
+            $total    = $summary['total_elapsed'];
+            require __DIR__ . '/panels/database.tab.phtml';
+        });
+    }
+
+    public function getPanel(): string
+    {
+        return Helpers::capture(function () {
+            $profiler = $this->data->getProfiler();
+            $profiles = $profiler instanceof Profiler ? $profiler->getProfiles() : [];
+            $data     = (new ProfilerDataFormatter())->format($profiles);
+            require __DIR__ . '/panels/database.panel.phtml';
+        });
     }
 }

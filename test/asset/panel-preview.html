@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Database Panel Preview — Traccio</title>
+<style>
+  /* ── Tracy dark-theme shell ── */
+  *, *::before, *::after { box-sizing: border-box; }
+  body { background: #1a1a1a; color: #d0d0d0; font: 13px/1.5 "DejaVu Sans", Tahoma, Verdana, sans-serif; margin: 0; padding: 20px; }
+  h1 { font-size: 1.1em; font-weight: bold; color: #d0d0d0; margin: 0 0 .6em; border-bottom: 1px solid #444; padding-bottom: .4em; }
+
+  /* ── Tracy panel wrapper ── */
+  .tracy-inner { background: #292929; min-width: 400px; max-width: 900px; }
+  .tracy-inner-container { padding: 8px; }
+
+  /* ── Tab mock ── */
+  .tab-preview {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #3a3a3a; border: 1px solid #555; border-bottom: none;
+    padding: 4px 10px; border-radius: 3px 3px 0 0; margin-bottom: 0;
+    font-size: .85em; color: #ccc;
+  }
+  .tab-preview svg { width: 16px; height: 16px; vertical-align: middle; }
+  .tracy-label { font-size: .9em; }
+
+  /* ── Summary table ── */
+  .tracy-QueryPanel-summary { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+  .tracy-QueryPanel-summary th { background: #333; color: #ccc; padding: 4px 8px; text-align: left; font-weight: normal; font-size: .85em; }
+  .tracy-QueryPanel-summary td { padding: 4px 8px; font-weight: bold; color: #e8e8e8; }
+
+  /* ── Query groups ── */
+  .tracy-QueryPanel-group { margin-bottom: .6em; border: 1px solid #444; }
+  .tracy-QueryPanel-group-header { background: #2d2d2d; padding: 5px 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .tracy-QueryPanel-badge { background: #7a86b8; color: #fff; border-radius: 3px; padding: 0 5px; font-size: .8em; flex-shrink: 0; }
+  .tracy-QueryPanel-sql { font-family: "DejaVu Sans Mono", Consolas, monospace; font-size: .9em; flex-grow: 1; word-break: break-all; color: #d4d4d4; }
+  .tracy-QueryPanel-group-time { color: #888; font-size: .8em; flex-shrink: 0; white-space: nowrap; }
+
+  /* ── Execution rows ── */
+  .tracy-QueryPanel-executions { width: 100%; border-collapse: collapse; font-size: .88em; }
+  .tracy-QueryPanel-executions th { background: #222; color: #888; padding: 2px 8px; font-weight: normal; text-align: left; }
+  .tracy-QueryPanel-executions td { padding: 3px 8px; border-top: 1px solid #333; vertical-align: top; color: #c8c8c8; }
+  .tracy-QueryPanel-executions td:first-child { color: #666; width: 24px; text-align: right; }
+  .tracy-QueryPanel-executions td:nth-child(2) { font-family: monospace; white-space: nowrap; }
+  .tracy-QueryPanel-executions td:nth-child(3) { white-space: nowrap; }
+
+  /* ── Parameter sub-table ── */
+  .tracy-QueryPanel-params { border-collapse: collapse; }
+  .tracy-QueryPanel-params td { padding: 0 4px; font-family: monospace; font-size: .9em; }
+  .tracy-QueryPanel-params td:first-child { color: #888; }
+  em { color: #666; font-style: italic; }
+
+  /* ── Slow highlight ── */
+  .slow { color: #e07070 !important; }
+</style>
+</head>
+<body>
+
+<!-- ── Tab bar mockup ── -->
+<div class="tab-preview">
+  <svg viewBox="0 0 2048 2048">
+    <path fill="#F29111" d="M1024 896q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0 768q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0-384q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0-1152q208 0 385 34.5t280 93.5 103 128v128q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-128q0-69 103-128t280-93.5 385-34.5z"/>
+  </svg>
+  <span class="tracy-label">Database: 6 / 14.2 ms</span>
+</div>
+
+<!-- ── Panel popup ── -->
+<div id="tracy-debug">
+<div class="tracy-inner tracy-QueryPanel">
+  <div class="tracy-inner-container">
+
+    <h1>Query Profiles</h1>
+
+    <!-- Summary bar -->
+    <table class="tracy-QueryPanel-summary">
+      <thead>
+        <tr>
+          <th>Total queries</th>
+          <th>Unique statements</th>
+          <th>Total elapsed</th>
+          <th>Slowest single</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>6</td>
+          <td>3</td>
+          <td>14.207 ms</td>
+          <td class="slow">8.312 ms</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Group 1 — slowest, repeated SELECT (3 executions) -->
+    <div class="tracy-QueryPanel-group">
+      <div class="tracy-QueryPanel-group-header">
+        <span class="tracy-QueryPanel-badge">3&times;</span>
+        <span class="tracy-QueryPanel-sql">SELECT * FROM users WHERE username = ?</span>
+        <span class="tracy-QueryPanel-group-time">10.124 ms total &bull; avg 3.375 ms</span>
+      </div>
+      <table class="tracy-QueryPanel-executions">
+        <thead>
+          <tr><th>#</th><th>Start</th><th>Elapsed</th><th>Parameters</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>14:32:01.048</td>
+            <td>4.112 ms</td>
+            <td>
+              <table class="tracy-QueryPanel-params"><tbody>
+                <tr><td>0</td><td>john_doe</td></tr>
+              </tbody></table>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>14:32:01.053</td>
+            <td>3.700 ms</td>
+            <td>
+              <table class="tracy-QueryPanel-params"><tbody>
+                <tr><td>0</td><td>jane_doe</td></tr>
+              </tbody></table>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>14:32:01.057</td>
+            <td>2.312 ms</td>
+            <td>
+              <table class="tracy-QueryPanel-params"><tbody>
+                <tr><td>0</td><td>admin</td></tr>
+              </tbody></table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Group 2 — INSERT with multiple params (2 executions) -->
+    <div class="tracy-QueryPanel-group">
+      <div class="tracy-QueryPanel-group-header">
+        <span class="tracy-QueryPanel-badge">2&times;</span>
+        <span class="tracy-QueryPanel-sql">INSERT INTO users (username, email) VALUES (?, ?)</span>
+        <span class="tracy-QueryPanel-group-time">2.771 ms total &bull; avg 1.386 ms</span>
+      </div>
+      <table class="tracy-QueryPanel-executions">
+        <thead>
+          <tr><th>#</th><th>Start</th><th>Elapsed</th><th>Parameters</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>4</td>
+            <td>14:32:01.061</td>
+            <td>1.543 ms</td>
+            <td>
+              <table class="tracy-QueryPanel-params"><tbody>
+                <tr><td>0</td><td>new_user</td></tr>
+                <tr><td>1</td><td>new@example.com</td></tr>
+              </tbody></table>
+            </td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>14:32:01.063</td>
+            <td>1.228 ms</td>
+            <td>
+              <table class="tracy-QueryPanel-params"><tbody>
+                <tr><td>0</td><td>another_user</td></tr>
+                <tr><td>1</td><td>another@example.com</td></tr>
+              </tbody></table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Group 3 — once-off DDL, no params -->
+    <div class="tracy-QueryPanel-group">
+      <div class="tracy-QueryPanel-group-header">
+        <span class="tracy-QueryPanel-badge">1&times;</span>
+        <span class="tracy-QueryPanel-sql">CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username VARCHAR(50) NOT NULL, email VARCHAR(100) NOT NULL)</span>
+        <span class="tracy-QueryPanel-group-time">1.312 ms total &bull; avg 1.312 ms</span>
+      </div>
+      <table class="tracy-QueryPanel-executions">
+        <thead>
+          <tr><th>#</th><th>Start</th><th>Elapsed</th><th>Parameters</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>6</td>
+            <td>14:32:01.039</td>
+            <td>1.312 ms</td>
+            <td><em>none</em></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- tracy-inner-container -->
+</div><!-- tracy-inner -->
+</div><!-- tracy-debug -->
+
+</body>
+</html>
