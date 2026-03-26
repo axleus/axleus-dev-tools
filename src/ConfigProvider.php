@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Webware\Traccio;
 
-use Mezzio\Application;
 use PhpDb\Adapter\AdapterInterface;
 use Tracy\Debugger;
 
@@ -44,7 +43,6 @@ final class ConfigProvider
     {
         return [
             'factories' => [
-                Application::class                        => Container\ApplicationFactory::class,
                 Debug\ConfigPanel::class                  => Debug\ConfigPanelFactory::class,
                 Debug\RequestPanel::class                 => Debug\RequestPanelFactory::class,
                 Debug\SqlProfilerPanel::class             => Debug\SqlProfilerPanelFactory::class,

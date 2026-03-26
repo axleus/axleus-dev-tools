@@ -151,6 +151,7 @@ final class ProfilerDataFormatterTest extends TestCase
         foreach ($result['groups'] as $g) {
             if ($g['sql'] === 'SELECT 1') {
                 $group1 = $g;
+
                 break;
             }
         }

@@ -1,19 +1,2 @@
 parameters:
 	ignoreErrors:
-		-
-			message: '#^Parameter \$middleware of method Webware\\Traccio\\Application\:\:pipe\(\) has invalid type Webware\\Traccio\\MiddlewareParam\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Application.php
-
-		-
-			message: '#^Parameter \$middlewareOrPath of method Webware\\Traccio\\Application\:\:pipe\(\) has invalid type Webware\\Traccio\\MiddlewareParam\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Application.php
-
-		-
-			message: '#^Class Mezzio\\ApplicationPipeline not found\.$#'
-			identifier: class.notFound
-			count: 1
-			path: src/Container/ApplicationFactory.php

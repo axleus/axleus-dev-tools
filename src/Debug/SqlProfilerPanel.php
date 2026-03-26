@@ -37,6 +37,7 @@ final class SqlProfilerPanel implements IBarPanel
             $summary  = (new ProfilerDataFormatter())->format($profiles)['summary'];
             $count    = $summary['total_queries'];
             $total    = $summary['total_elapsed'];
+
             require __DIR__ . '/panels/database.tab.phtml';
         });
     }
@@ -47,6 +48,7 @@ final class SqlProfilerPanel implements IBarPanel
             $profiler = $this->data->getProfiler();
             $profiles = $profiler instanceof Profiler ? $profiler->getProfiles() : [];
             $data     = (new ProfilerDataFormatter())->format($profiles);
+
             require __DIR__ . '/panels/database.panel.phtml';
         });
     }
