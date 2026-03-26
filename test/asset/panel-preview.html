@@ -4,53 +4,54 @@
 <meta charset="UTF-8">
 <title>Database Panel Preview — Traccio</title>
 <style>
-  /* ── Tracy dark-theme shell ── */
+  /* ── Exact Tracy bar.css rules that conflict with custom dark styling ── */
+  #tracy-debug table { background: #FDF5CE; width: 100%; }
+  #tracy-debug tr:nth-child(2n) td { background: rgba(0,0,0,.02); }
+  #tracy-debug td, #tracy-debug th { border: 1px solid #E6DFBF; padding: 2px 5px; vertical-align: top; text-align: left; }
+  #tracy-debug th { background: #F4F3F1; color: #655E5E; font-size: 90%; font-weight: bold; }
+  #tracy-debug h1 { font: normal normal 23px/1.4 Tahoma, sans-serif; line-height:1; color: #575753; margin: 0; }
+  #tracy-debug .tracy-panel { font: normal normal 12px/1.5 sans-serif; background: white; color: #333; text-align: left; }
+  #tracy-debug .tracy-inner { overflow: auto; flex: 1; }
+  #tracy-debug .tracy-inner-container { min-width: fit-content; }
   *, *::before, *::after { box-sizing: border-box; }
-  body { background: #1a1a1a; color: #d0d0d0; font: 13px/1.5 "DejaVu Sans", Tahoma, Verdana, sans-serif; margin: 0; padding: 20px; }
-  h1 { font-size: 1.1em; font-weight: bold; color: #d0d0d0; margin: 0 0 .6em; border-bottom: 1px solid #444; padding-bottom: .4em; }
+  body { background: #1a1a1a; margin: 0; padding: 20px; }
 
-  /* ── Tracy panel wrapper ── */
-  .tracy-inner { background: #292929; min-width: 400px; max-width: 900px; }
-  .tracy-inner-container { padding: 8px; }
-
-  /* ── Tab mock ── */
-  .tab-preview {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: #3a3a3a; border: 1px solid #555; border-bottom: none;
-    padding: 4px 10px; border-radius: 3px 3px 0 0; margin-bottom: 0;
-    font-size: .85em; color: #ccc;
-  }
-  .tab-preview svg { width: 16px; height: 16px; vertical-align: middle; }
-  .tracy-label { font-size: .9em; }
+  /* ── Override Tracy's light-theme defaults for the entire panel ── */
+  #tracy-debug .tracy-QueryPanel { background: #1e1e1e; color: #d0d0d0; }
+  #tracy-debug .tracy-QueryPanel h1 { color: #d0d0d0; }
+  #tracy-debug .tracy-QueryPanel table { background: transparent; }
+  #tracy-debug .tracy-QueryPanel td,
+  #tracy-debug .tracy-QueryPanel th { border-color: #444; color: #d0d0d0; }
+  #tracy-debug .tracy-QueryPanel tr:nth-child(2n) td { background: rgba(255,255,255,.03); }
 
   /* ── Summary table ── */
-  .tracy-QueryPanel-summary { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
-  .tracy-QueryPanel-summary th { background: #333; color: #ccc; padding: 4px 8px; text-align: left; font-weight: normal; font-size: .85em; }
-  .tracy-QueryPanel-summary td { padding: 4px 8px; font-weight: bold; color: #e8e8e8; }
+  #tracy-debug .tracy-QueryPanel-summary { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+  #tracy-debug .tracy-QueryPanel-summary th { background: #333; color: #aaa; padding: 4px 8px; text-align: left; font-weight: normal; font-size: .85em; }
+  #tracy-debug .tracy-QueryPanel-summary td { background: #252525; padding: 4px 8px; font-weight: bold; color: #e8e8e8; }
 
-  /* ── Query groups ── */
-  .tracy-QueryPanel-group { margin-bottom: .6em; border: 1px solid #444; }
-  .tracy-QueryPanel-group-header { background: #2d2d2d; padding: 5px 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-  .tracy-QueryPanel-badge { background: #7a86b8; color: #fff; border-radius: 3px; padding: 0 5px; font-size: .8em; flex-shrink: 0; }
-  .tracy-QueryPanel-sql { font-family: "DejaVu Sans Mono", Consolas, monospace; font-size: .9em; flex-grow: 1; word-break: break-all; color: #d4d4d4; }
-  .tracy-QueryPanel-group-time { color: #888; font-size: .8em; flex-shrink: 0; white-space: nowrap; }
+  /* ── Group cards ── */
+  #tracy-debug .tracy-QueryPanel-group { margin-bottom: .6em; border: 1px solid #444; }
+  #tracy-debug .tracy-QueryPanel-group-header { background: #2d2d2d; padding: 5px 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  #tracy-debug .tracy-QueryPanel-badge { background: #7a86b8; color: #fff; border-radius: 3px; padding: 0 5px; font-size: .8em; flex-shrink: 0; }
+  #tracy-debug .tracy-QueryPanel-sql { font-family: monospace; font-size: .9em; flex-grow: 1; word-break: break-all; color: #d4d4d4; }
+  #tracy-debug .tracy-QueryPanel-group-time { color: #888; font-size: .8em; flex-shrink: 0; }
 
   /* ── Execution rows ── */
-  .tracy-QueryPanel-executions { width: 100%; border-collapse: collapse; font-size: .88em; }
-  .tracy-QueryPanel-executions th { background: #222; color: #888; padding: 2px 8px; font-weight: normal; text-align: left; }
-  .tracy-QueryPanel-executions td { padding: 3px 8px; border-top: 1px solid #333; vertical-align: top; color: #c8c8c8; }
-  .tracy-QueryPanel-executions td:first-child { color: #666; width: 24px; text-align: right; }
-  .tracy-QueryPanel-executions td:nth-child(2) { font-family: monospace; white-space: nowrap; }
-  .tracy-QueryPanel-executions td:nth-child(3) { white-space: nowrap; }
+  #tracy-debug .tracy-QueryPanel-executions { width: 100%; border-collapse: collapse; font-size: .9em; }
+  #tracy-debug .tracy-QueryPanel-executions th { background: #222; color: #888; padding: 2px 8px; font-weight: normal; text-align: left; }
+  #tracy-debug .tracy-QueryPanel-executions td { background: #1e1e1e; padding: 3px 8px; border-top: 1px solid #333; vertical-align: top; color: #c8c8c8; }
+  #tracy-debug .tracy-QueryPanel-executions tr:nth-child(2n) td { background: #232323; }
 
   /* ── Parameter sub-table ── */
-  .tracy-QueryPanel-params { border-collapse: collapse; }
-  .tracy-QueryPanel-params td { padding: 0 4px; font-family: monospace; font-size: .9em; }
-  .tracy-QueryPanel-params td:first-child { color: #888; }
-  em { color: #666; font-style: italic; }
+  #tracy-debug .tracy-QueryPanel-params { background: transparent; }
+  #tracy-debug .tracy-QueryPanel-params td { background: transparent; border: none; padding: 0 4px; font-family: monospace; font-size: .9em; color: #c8c8c8; }
+  #tracy-debug .tracy-QueryPanel-params td:first-child { color: #777; }
 
-  /* ── Slow highlight ── */
-  .slow { color: #e07070 !important; }
+  /* ── Tab mock ── */
+  .tab-preview { display: inline-flex; align-items: center; gap: 5px; background: #3a3a3a; border: 1px solid #555; border-bottom: none; padding: 4px 10px; border-radius: 3px 3px 0 0; margin-bottom: 0; font: .85em/1.5 Tahoma, sans-serif; color: #ccc; }
+  .tab-preview svg { width: 16px; height: 16px; vertical-align: middle; }
+  .tracy-label { font-size: .9em; }
+  em { color: #666; font-style: italic; }
 </style>
 </head>
 <body>
@@ -108,7 +109,7 @@
             <td>4.112 ms</td>
             <td>
               <table class="tracy-QueryPanel-params"><tbody>
-                <tr><td>0</td><td>john_doe</td></tr>
+                <tr><td>?1</td><td>john_doe</td></tr>
               </tbody></table>
             </td>
           </tr>
@@ -118,7 +119,7 @@
             <td>3.700 ms</td>
             <td>
               <table class="tracy-QueryPanel-params"><tbody>
-                <tr><td>0</td><td>jane_doe</td></tr>
+                <tr><td>?1</td><td>jane_doe</td></tr>
               </tbody></table>
             </td>
           </tr>
@@ -128,7 +129,7 @@
             <td>2.312 ms</td>
             <td>
               <table class="tracy-QueryPanel-params"><tbody>
-                <tr><td>0</td><td>admin</td></tr>
+                <tr><td>?1</td><td>admin</td></tr>
               </tbody></table>
             </td>
           </tr>
@@ -136,11 +137,11 @@
       </table>
     </div>
 
-    <!-- Group 2 — INSERT with multiple params (2 executions) -->
+    <!-- Group 2 — SQL-builder INSERT with named :C_n params (2 executions) -->
     <div class="tracy-QueryPanel-group">
       <div class="tracy-QueryPanel-group-header">
         <span class="tracy-QueryPanel-badge">2&times;</span>
-        <span class="tracy-QueryPanel-sql">INSERT INTO users (username, email) VALUES (?, ?)</span>
+        <span class="tracy-QueryPanel-sql">INSERT INTO `users` (`username`, `email`) VALUES (:C_1, :C_2)</span>
         <span class="tracy-QueryPanel-group-time">2.771 ms total &bull; avg 1.386 ms</span>
       </div>
       <table class="tracy-QueryPanel-executions">
@@ -154,8 +155,8 @@
             <td>1.543 ms</td>
             <td>
               <table class="tracy-QueryPanel-params"><tbody>
-                <tr><td>0</td><td>new_user</td></tr>
-                <tr><td>1</td><td>new@example.com</td></tr>
+                <tr><td>:C_1</td><td>new_user</td></tr>
+                <tr><td>:C_2</td><td>new@example.com</td></tr>
               </tbody></table>
             </td>
           </tr>
@@ -165,8 +166,8 @@
             <td>1.228 ms</td>
             <td>
               <table class="tracy-QueryPanel-params"><tbody>
-                <tr><td>0</td><td>another_user</td></tr>
-                <tr><td>1</td><td>another@example.com</td></tr>
+                <tr><td>:C_1</td><td>another_user</td></tr>
+                <tr><td>:C_2</td><td>another@example.com</td></tr>
               </tbody></table>
             </td>
           </tr>
