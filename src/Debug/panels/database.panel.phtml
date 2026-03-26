@@ -6,66 +6,97 @@ namespace Webware\Traccio\Debug;
 
 use Tracy\Helpers;
 
+// $data is the formatted array produced by ProfilerDataFormatter::format()
+$summary = $data['summary'];
+$groups  = $data['groups'];
 ?>
 <style class="tracy-debug">
-	#tracy-debug .tracy-QueryPanel td:nth-child(2) {
-		font-weight: bold;
-		width: 60%;
-	}
-	#tracy-debug .tracy-QueryPanel td[colspan='2'] b {
-		margin-left: 2em;
-		white-space: normal;
-	}
+    #tracy-debug .tracy-QueryPanel-summary { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+    #tracy-debug .tracy-QueryPanel-summary th { background: #333; color: #ccc; padding: 4px 8px; text-align: left; font-weight: normal; font-size: .85em; }
+    #tracy-debug .tracy-QueryPanel-summary td { padding: 4px 8px; font-weight: bold; }
+    #tracy-debug .tracy-QueryPanel-group { margin-bottom: .6em; border: 1px solid #444; }
+    #tracy-debug .tracy-QueryPanel-group-header { background: #2d2d2d; padding: 5px 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    #tracy-debug .tracy-QueryPanel-badge { background: #7a86b8; color: #fff; border-radius: 3px; padding: 0 5px; font-size: .8em; flex-shrink: 0; }
+    #tracy-debug .tracy-QueryPanel-sql { font-family: monospace; font-size: .9em; flex-grow: 1; word-break: break-all; }
+    #tracy-debug .tracy-QueryPanel-group-time { color: #999; font-size: .8em; flex-shrink: 0; }
+    #tracy-debug .tracy-QueryPanel-executions { width: 100%; border-collapse: collapse; font-size: .9em; }
+    #tracy-debug .tracy-QueryPanel-executions th { background: #222; color: #999; padding: 2px 8px; font-weight: normal; text-align: left; }
+    #tracy-debug .tracy-QueryPanel-executions td { padding: 2px 8px; border-top: 1px solid #333; vertical-align: top; }
+    #tracy-debug .tracy-QueryPanel-params td:first-child { color: #999; padding-right: 4px; }
 </style>
 <h1>Query Profiles</h1>
 <div class="tracy-inner tracy-QueryPanel">
     <div class="tracy-inner-container">
-        <?php foreach ($data->getProfiler()->getProfiles() as $profile): ?>
-            <div class="tracy-QueryPanel-queries">
-                <table>
-                    <thead>
-                        <tr>
-                            <th colspan="3">
-                                <?php if ($profile['sql']): ?>
-                                    <h3><?= Helpers::escapeHtml($profile['sql']) ?></h3>
-                                <?php endif ?>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="3">Timing:</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">Start: <?=$profile['start']?></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">End: <?=$profile['end']?></td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"><b>Elapsed: <?=$profile['elapse']?><b></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">Parameters:</td>
-                        </tr>
-                        <?php
-                        if ($profile['parameters'] !== null):
-                            foreach ($profile['parameters']->getNamedArray() as $position => $value): ?>
-                        <tr>
-                            <td><?=$position?></td>
-                            <td><?=$value?></td>
-                        </tr>
-                        <?php
-                            endforeach;
-                        else: ?>
-                        <tr>
-                            <td colspan="2"><em>No parameters</em></td>
-                        </tr>
-                        <?php
-                        endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endforeach ?>
+        <table class="tracy-QueryPanel-summary">
+            <thead>
+                <tr>
+                    <th>Total queries</th>
+                    <th>Unique statements</th>
+                    <th>Total elapsed</th>
+                    <th>Slowest single</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><?= $summary['total_queries'] ?></td>
+                    <td><?= $summary['unique_statements'] ?></td>
+                    <td><?= sprintf('%.3f ms', $summary['total_elapsed'] * 1000) ?></td>
+                    <td><?= sprintf('%.3f ms', $summary['slowest_elapsed'] * 1000) ?></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <?php if ($groups === []): ?>
+            <p><em>No queries recorded.</em></p>
+        <?php else: ?>
+            <?php foreach ($groups as $group): ?>
+                <div class="tracy-QueryPanel-group">
+                    <div class="tracy-QueryPanel-group-header">
+                        <span class="tracy-QueryPanel-badge"><?= $group['count'] ?>&times;</span>
+                        <span class="tracy-QueryPanel-sql"><?= Helpers::escapeHtml($group['sql']) ?></span>
+                        <span class="tracy-QueryPanel-group-time">
+                            <?= sprintf('%.3f ms', $group['total_elapsed'] * 1000) ?> total
+                            &bull;
+                            avg <?= sprintf('%.3f ms', $group['avg_elapsed'] * 1000) ?>
+                        </span>
+                    </div>
+                    <table class="tracy-QueryPanel-executions">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Start</th>
+                                <th>Elapsed</th>
+                                <th>Parameters</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($group['executions'] as $exec): ?>
+                                <tr>
+                                    <td><?= $exec['index'] + 1 ?></td>
+                                    <td><?= date('H:i:s', (int) $exec['start']) . sprintf('.%03d', (int)(($exec['start'] - (int) $exec['start']) * 1000)) ?></td>
+                                    <td><?= sprintf('%.3f ms', $exec['elapsed'] * 1000) ?></td>
+                                    <td>
+                                        <?php if ($exec['parameters'] !== null && count($exec['parameters']) > 0): ?>
+                                            <table class="tracy-QueryPanel-params">
+                                                <tbody>
+                                                    <?php foreach ($exec['parameters']->getNamedArray() as $k => $v): ?>
+                                                        <tr>
+                                                            <td><?= Helpers::escapeHtml((string) $k) ?></td>
+                                                            <td><?= Helpers::escapeHtml((string) $v) ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        <?php else: ?>
+                                            <em>none</em>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>

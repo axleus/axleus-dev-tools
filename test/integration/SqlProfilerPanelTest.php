@@ -143,10 +143,11 @@ final class SqlProfilerPanelTest extends TestCase
 
         $panelContent = $this->panel->getPanel();
 
-        $this->assertStringContainsString('Timing:', $panelContent);
-        $this->assertStringContainsString('Start:', $panelContent);
-        $this->assertStringContainsString('End:', $panelContent);
-        $this->assertStringContainsString('Elapsed:', $panelContent);
+        $this->assertStringContainsString('Start', $panelContent);
+        $this->assertStringContainsString('Elapsed', $panelContent);
+        $this->assertStringContainsString('ms', $panelContent);
+        // Wall-clock time in H:i:s.mmm format
+        $this->assertMatchesRegularExpression('/\d{2}:\d{2}:\d{2}\.\d{3}/', $panelContent);
     }
 
     public function testPanelShowsQueryParameters(): void
@@ -156,7 +157,6 @@ final class SqlProfilerPanelTest extends TestCase
 
         $panelContent = $this->panel->getPanel();
 
-        $this->assertStringContainsString('Parameters:', $panelContent);
         $this->assertStringContainsString('test_user', $panelContent);
         $this->assertStringContainsString('test@example.com', $panelContent);
     }
@@ -251,8 +251,9 @@ final class SqlProfilerPanelTest extends TestCase
 
         $tabContent = $this->panel->getTab();
 
-        // The tab should contain the query count
+        // The tab should contain a query count and total elapsed time
         $this->assertStringContainsString('2', $tabContent);
+        $this->assertStringContainsString('ms', $tabContent);
     }
 
     public function testSetDataUpdatesAdapterReference(): void
@@ -310,6 +311,35 @@ final class SqlProfilerPanelTest extends TestCase
         $this->assertStringContainsString('user1@example.com', $panelContent);
         $this->assertStringContainsString('user2@example.com', $panelContent);
         $this->assertStringContainsString('user3@example.com', $panelContent);
+    }
+
+    public function testPanelGroupsRepeatedStatements(): void
+    {
+        // Same SQL, different parameters — exercises the prepared+execute profiling path
+        $this->adapter->query('SELECT * FROM users WHERE username = ?', ['john_doe']);
+        $this->adapter->query('SELECT * FROM users WHERE username = ?', ['jane_doe']);
+        $this->adapter->query('SELECT * FROM users WHERE username = ?', ['other_user']);
+
+        $panelContent = $this->panel->getPanel();
+
+        // The SQL appears exactly once as the group header, not once per execution
+        $this->assertSame(1, substr_count($panelContent, 'SELECT * FROM users WHERE username = ?'));
+        // Group count badge shows 3×
+        $this->assertStringContainsString('3&times;', $panelContent);
+    }
+
+    public function testPanelSummaryShowsTotalQueriesAndUniqueStatements(): void
+    {
+        // Two distinct prepared queries, one repeated — 3 total, 2 unique
+        $this->adapter->query('SELECT * FROM users WHERE username = ?', ['john_doe']);
+        $this->adapter->query('SELECT COUNT(*) FROM users', Adapter::QUERY_MODE_EXECUTE);
+        $this->adapter->query('SELECT * FROM users WHERE username = ?', ['jane_doe']);
+
+        $panelContent = $this->panel->getPanel();
+
+        $this->assertStringContainsString('Total queries', $panelContent);
+        $this->assertStringContainsString('Unique statements', $panelContent);
+        $this->assertStringContainsString('Total elapsed', $panelContent);
     }
 
     private function createAdapter(): Adapter
