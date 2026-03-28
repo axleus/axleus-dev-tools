@@ -17,8 +17,24 @@ namespace Webware\Traccio;
 use PhpDb\Adapter\AdapterInterface;
 use Tracy\Debugger;
 
+/**
+ * @internal
+ *
+ * @phpstan-type DependencyShape array{
+ *     factories: array<class-string, class-string>,
+ *     delegators?: array<class-string, array<int, class-string>>,
+ * }
+ * @phpstan-type ConfigShape array{
+ *     debug?: bool,
+ *     DependencyShape,
+ *     Debugger::class: TracyConfig,
+ * }
+ */
 final class ConfigProvider
 {
+    /**
+     * @phpstan-return ConfigShape
+     */
     public function __invoke(): array
     {
         return [
@@ -42,6 +58,9 @@ final class ConfigProvider
         ];
     }
 
+    /**
+     * @phpstan-return DependencyShape
+     */
     public function getDependencies(): array
     {
         return [
