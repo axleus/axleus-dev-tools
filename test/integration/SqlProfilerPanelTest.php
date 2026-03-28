@@ -19,6 +19,7 @@ use PhpDb\Adapter\Adapter;
 use PhpDb\Adapter\AdapterInterface;
 use PhpDb\Adapter\Driver\Pdo\Result;
 use PhpDb\Adapter\Driver\Pdo\Statement;
+use PhpDb\Adapter\ParameterContainer;
 use PhpDb\Adapter\Profiler\Profiler;
 use PhpDb\Adapter\Profiler\ProfilerAwareInterface;
 use PhpDb\Sql\Ddl\Column\Integer;
@@ -40,6 +41,10 @@ use Webware\Traccio\PhpDb\ProfilingDelegator;
 use function count;
 use function str_contains;
 
+/**
+ * @phpstan-import-type ProfileShape from Profiler
+ * @phpstan-import-type ProfilesShape from Profiler
+ */
 #[CoversClass(SqlProfilerPanel::class)]
 #[CoversClass(SqlProfilerPanelFactory::class)]
 #[CoversClass(ProfilingDelegator::class)]
@@ -256,28 +261,6 @@ final class SqlProfilerPanelTest extends TestCase
         $this->assertStringContainsString('ms', $tabContent);
     }
 
-    public function testSetDataUpdatesAdapterReference(): void
-    {
-        // Create a second adapter with different queries
-        $newAdapter = $this->createAdapter();
-
-        // Setup schema using DDL
-        $createTable = new CreateTable('test2');
-        $createTable->addColumn(new Integer('id'));
-
-        $sql       = new Sql($newAdapter);
-        $sqlString = $sql->buildSqlString($createTable);
-        $newAdapter->query($sqlString, Adapter::QUERY_MODE_EXECUTE);
-
-        $newAdapter->query('SELECT * FROM test2');
-
-        // Update the panel's data
-        $this->panel->setData($newAdapter);
-
-        $panelContent = $this->panel->getPanel();
-        $this->assertStringContainsString('test2', $panelContent);
-    }
-
     public function testPanelHandlesEmptyProfiles(): void
     {
         // Create a fresh adapter with no queries
@@ -299,12 +282,17 @@ final class SqlProfilerPanelTest extends TestCase
         );
 
         /** @var Profiler $profiler */
-        $profiler    = $this->adapter->getProfiler();
+        $profiler = $this->adapter->getProfiler();
+
+        /** @var ProfilesShape $profiles */
         $profiles    = $profiler->getProfiles();
         $lastProfile = $profiles[count($profiles) - 1];
 
+        /** @var ParameterContainer $parameters */
+        $parameters = $lastProfile['parameters'];
+
         $this->assertStringContainsString('INSERT INTO users', $lastProfile['sql']);
-        $this->assertCount(6, $lastProfile['parameters']->getNamedArray());
+        $this->assertCount(6, $parameters);
 
         $panelContent = $this->panel->getPanel();
 
@@ -371,7 +359,8 @@ final class SqlProfilerPanelTest extends TestCase
         // In SQLite, INTEGER PRIMARY KEY is automatically auto-incrementing
         $createTable = new CreateTable('users');
 
-        $createTable->addColumn(new Integer('id', true, null, ['auto_increment' => true]))
+        $id = new Integer(name: 'id', nullable: true, options: ['autoincrement' => true]);
+        $createTable->addColumn($id)
             ->addColumn(new Varchar('username', 50, false))
             ->addColumn(new Varchar('email', 100, false));
 

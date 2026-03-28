@@ -20,6 +20,9 @@ final class ConfigPanelFactory
 {
     public function __invoke(ContainerInterface $container): ConfigPanel
     {
-        return new ConfigPanel($container->get('config'));
+        /** @var array<mixed> $config */
+        $config = $container->get('config');
+
+        return new ConfigPanel($config);
     }
 }

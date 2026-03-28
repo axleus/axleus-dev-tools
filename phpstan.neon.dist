@@ -1,7 +1,7 @@
 includes:
     - phpstan-baseline.neon
 parameters:
-    level: 5
+    level: 10
     paths:
         - src
         - test
@@ -15,3 +15,5 @@ parameters:
         - stubs/Laminas/ServiceManager/Initializer/InitializerInterface.stub
         - stubs/Psr/Container/ContainerInterface.stub
     treatPhpDocTypesAsCertain: false
+    typeAliases:
+        TracyConfig: 'array{enable?: bool, productionMode?: bool|null, showBar?: bool, reservedMemorySize?: int, strictMode?: bool|int, scream?: bool|int, maxDepth?: int, maxLength?: int, maxItems?: int, showLocation?: bool|null, keysToHide?: string[], dumpTheme?: string, logDirectory?: string|null, logSeverity?: int, email?: string|string[]|null, editor?: string|null, editorMapping?: array<string, string>, browser?: string|null, errorTemplate?: string|null, customCssFiles?: string[], customJsFiles?: string[]}'

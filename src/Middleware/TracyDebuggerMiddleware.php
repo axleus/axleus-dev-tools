@@ -27,6 +27,7 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
 
     public function __construct(
         private bool $debug,
+        /** @var TracyConfig $tracyConfig */
         private array $tracyConfig,
         private bool $enableSqlProfiler,
         private ?Debug\ConfigPanel $configPanel,
@@ -37,10 +38,11 @@ class TracyDebuggerMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($this->debug) {
+            if (isset($this->tracyConfig[self::ENABLE_KEY])) {
+                Debugger::enable($this->tracyConfig[self::ENABLE_KEY]);
+            }
             foreach ($this->tracyConfig as $key => $value) {
                 if ($key === self::ENABLE_KEY) {
-                    Debugger::enable($value);
-
                     continue;
                 }
                 Debugger::${$key} = $value;

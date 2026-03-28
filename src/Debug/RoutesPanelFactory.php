@@ -21,6 +21,9 @@ final class RoutesPanelFactory
 {
     public function __invoke(ContainerInterface $container): RoutesPanel
     {
-        return new RoutesPanel($container->get(RouteCollectorInterface::class));
+        /** @var RouteCollectorInterface $routeCollector */
+        $routeCollector = $container->get(RouteCollectorInterface::class);
+
+        return new RoutesPanel($routeCollector);
     }
 }

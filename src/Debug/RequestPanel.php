@@ -15,15 +15,40 @@ declare(strict_types=1);
 namespace Webware\Traccio\Debug;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Tracy\Helpers;
 use Tracy\IBarPanel;
 
 final class RequestPanel implements IBarPanel
 {
-    use IBarPanelTrait;
+    private readonly string $id;
 
     public function __construct(
         private ?ServerRequestInterface $data = null,
     ) {
         $this->id = 'request';
+    }
+
+    public function getTab(): string
+    {
+        return Helpers::capture(function () {
+            $data  = $this->data;
+            $title = $this->id;
+
+            require __DIR__ . "/panels/{$this->id}.tab.phtml";
+        });
+    }
+
+    public function getPanel(): string
+    {
+        return Helpers::capture(function () {
+            $data = $this->data;
+
+            require __DIR__ . "/panels/{$this->id}.panel.phtml";
+        });
+    }
+
+    public function setData(?ServerRequestInterface $data): void
+    {
+        $this->data = $data;
     }
 }

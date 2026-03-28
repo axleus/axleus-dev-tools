@@ -19,9 +19,9 @@ use PhpDb\Adapter\Profiler\Profiler;
 use Tracy\Helpers;
 use Tracy\IBarPanel;
 
-final class SqlProfilerPanel implements IBarPanel
+final readonly class SqlProfilerPanel implements IBarPanel
 {
-    use IBarPanelTrait;
+    private string $id;
 
     public function __construct(
         private AdapterInterface $data,
@@ -38,7 +38,7 @@ final class SqlProfilerPanel implements IBarPanel
             $count    = $summary['total_queries'];
             $total    = $summary['total_elapsed'];
 
-            require __DIR__ . '/panels/database.tab.phtml';
+            require __DIR__ . "/panels/{$this->id}.tab.phtml";
         });
     }
 
@@ -49,7 +49,7 @@ final class SqlProfilerPanel implements IBarPanel
             $profiles = $profiler instanceof Profiler ? $profiler->getProfiles() : [];
             $data     = (new ProfilerDataFormatter())->format($profiles);
 
-            require __DIR__ . '/panels/database.panel.phtml';
+            require __DIR__ . "/panels/{$this->id}.panel.phtml";
         });
     }
 }
