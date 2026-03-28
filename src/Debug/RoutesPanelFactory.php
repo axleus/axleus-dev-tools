@@ -23,7 +23,7 @@ final class RoutesPanelFactory
     {
         /** @var RouteCollectorInterface $routeCollector */
         $routeCollector = $container->get(RouteCollectorInterface::class);
-        
+
         return new RoutesPanel($routeCollector);
     }
 }

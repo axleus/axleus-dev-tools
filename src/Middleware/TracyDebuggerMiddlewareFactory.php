@@ -17,7 +17,6 @@ namespace Webware\Traccio\Middleware;
 use Mezzio\Router\RouteCollectorInterface;
 use PhpDb\Adapter\Profiler\ProfilerInterface;
 use Psr\Container\ContainerInterface;
-use Tracy\Debugger;
 use Webware\Traccio\Configuration;
 use Webware\Traccio\Debug;
 
@@ -40,7 +39,7 @@ final class TracyDebuggerMiddlewareFactory
         $sqlProfilerPanel = $hasProfiler && $container->has(Debug\SqlProfilerPanel::class)
             ? $container->get(Debug\SqlProfilerPanel::class)
             : null;
-        
+
         return new TracyDebuggerMiddleware(
             Configuration::debug($container),
             Configuration::get($container),

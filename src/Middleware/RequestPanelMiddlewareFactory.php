@@ -33,7 +33,7 @@ final readonly class RequestPanelMiddlewareFactory
     {
         /** @var Debug\RequestPanel $requestPanel */
         $requestPanel = $container->get(Debug\RequestPanel::class);
-        
+
         return new RequestPanelMiddleware(
             $requestPanel,
             Configuration::debug($container),

@@ -22,7 +22,7 @@ use Tracy\IBarPanel;
 final class SqlProfilerPanel implements IBarPanel
 {
     protected string $id;
-    
+
     public function __construct(
         private AdapterInterface $data,
     ) {

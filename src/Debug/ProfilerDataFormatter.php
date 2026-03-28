@@ -24,9 +24,10 @@ use function usort;
 
 /**
  * @internal
- * 
+ *
  * @phpstan-import-type ProfileShape from Profiler
  * @phpstan-import-type ProfilesShape from Profiler
+ *
  * @phpstan-type GroupedProfileShape array{sql: string, count: int, total_elapsed: float, slowest: float, avg_elapsed: float, executions: list<array{index: int, start: float, elapsed: float, parameters: ParameterContainer|null}>}
  * @phpstan-type FormattedDataShape array{
  *   summary: array{total_queries: int, unique_statements: int, total_elapsed: float, slowest_elapsed: float},

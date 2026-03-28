@@ -282,7 +282,8 @@ final class SqlProfilerPanelTest extends TestCase
         );
 
         /** @var Profiler $profiler */
-        $profiler    = $this->adapter->getProfiler();
+        $profiler = $this->adapter->getProfiler();
+
         /** @var ProfilesShape $profiles */
         $profiles    = $profiler->getProfiles();
         $lastProfile = $profiles[count($profiles) - 1];

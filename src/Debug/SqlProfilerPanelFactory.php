@@ -23,7 +23,7 @@ final class SqlProfilerPanelFactory
     {
         /** @var AdapterInterface $adapter */
         $adapter = $container->get(AdapterInterface::class);
-        
+
         return new SqlProfilerPanel($adapter);
     }
 }

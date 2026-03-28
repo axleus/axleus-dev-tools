@@ -21,7 +21,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Tracy\Debugger;
 use Webware\Traccio\Debug;
 
-
 class TracyDebuggerMiddleware implements MiddlewareInterface
 {
     final public const ENABLE_KEY = 'enable';

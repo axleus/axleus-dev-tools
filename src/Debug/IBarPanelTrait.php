@@ -41,9 +41,7 @@ trait IBarPanelTrait
         });
     }
 
-    /**
-     * @param array|object $data 
-     */
+    // @param array|object $data
     // public function setData($data): void
     // {
     //     $this->data = $data;
