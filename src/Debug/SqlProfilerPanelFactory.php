@@ -21,6 +21,9 @@ final class SqlProfilerPanelFactory
 {
     public function __invoke(ContainerInterface $container): SqlProfilerPanel
     {
-        return new SqlProfilerPanel($container->get(AdapterInterface::class));
+        /** @var AdapterInterface $adapter */
+        $adapter = $container->get(AdapterInterface::class);
+        
+        return new SqlProfilerPanel($adapter);
     }
 }

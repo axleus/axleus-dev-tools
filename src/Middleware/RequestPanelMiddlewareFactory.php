@@ -17,9 +17,13 @@ namespace Webware\Traccio\Middleware;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Webware\Traccio\Configuration;
 use Webware\Traccio\Debug;
 
-final class RequestPanelMiddlewareFactory
+/**
+ * @internal
+ */
+final readonly class RequestPanelMiddlewareFactory
 {
     /**
      * @throws ContainerExceptionInterface
@@ -27,15 +31,12 @@ final class RequestPanelMiddlewareFactory
      */
     public function __invoke(ContainerInterface $container): RequestPanelMiddleware
     {
-        /** @var bool */
-        $debug = $container->get('config')['debug'];
-
-        /** @var bool */
-        $override = $container->get('config')['debug_overrides']['show_debugger_in_production'];
-
+        /** @var Debug\RequestPanel $requestPanel */
+        $requestPanel = $container->get(Debug\RequestPanel::class);
+        
         return new RequestPanelMiddleware(
-            $container->get(Debug\RequestPanel::class),
-            $debug ? $debug : $override,
+            $requestPanel,
+            Configuration::debug($container),
         );
     }
 }

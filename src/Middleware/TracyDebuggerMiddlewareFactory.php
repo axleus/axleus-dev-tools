@@ -18,23 +18,36 @@ use Mezzio\Router\RouteCollectorInterface;
 use PhpDb\Adapter\Profiler\ProfilerInterface;
 use Psr\Container\ContainerInterface;
 use Tracy\Debugger;
+use Webware\Traccio\Configuration;
 use Webware\Traccio\Debug;
 
 final class TracyDebuggerMiddlewareFactory
 {
     public function __invoke(ContainerInterface $container): TracyDebuggerMiddleware
     {
+        /** @var bool $hasProfiler */
         $hasProfiler = $container->has(ProfilerInterface::class);
         // Gotta have both the route collector and the panel to add it to the bar
         $hasRouteCollector = $container->has(RouteCollectorInterface::class) && $container->has(Debug\RoutesPanel::class);
 
+        /** @var Debug\RoutesPanel|null $routesPanel */
+        $routesPanel = $hasRouteCollector ? $container->get(Debug\RoutesPanel::class) : null;
+
+        /** @var Debug\ConfigPanel|null $configPanel */
+        $configPanel = $container->has(Debug\ConfigPanel::class) ? $container->get(Debug\ConfigPanel::class) : null;
+
+        /** @var Debug\SqlProfilerPanel|null $sqlProfilerPanel */
+        $sqlProfilerPanel = $hasProfiler && $container->has(Debug\SqlProfilerPanel::class)
+            ? $container->get(Debug\SqlProfilerPanel::class)
+            : null;
+        
         return new TracyDebuggerMiddleware(
-            $container->get('config')['debug'],
-            $container->get('config')[Debugger::class],
+            Configuration::debug($container),
+            Configuration::get($container),
             $hasProfiler,
-            $container->has(Debug\ConfigPanel::class) ? $container->get(Debug\ConfigPanel::class) : null,
-            $hasProfiler ? $container->get(Debug\SqlProfilerPanel::class) : null,
-            $hasRouteCollector ? $container->get(Debug\RoutesPanel::class) : null,
+            $configPanel,
+            $sqlProfilerPanel,
+            $routesPanel
         );
     }
 }

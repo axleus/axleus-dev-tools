@@ -27,6 +27,9 @@ final class ConfigProvider
         ];
     }
 
+    /**
+     * @return TracyConfig
+     */
     public function getTracyConfig(): array
     {
         return [

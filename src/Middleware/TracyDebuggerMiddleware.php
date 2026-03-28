@@ -21,12 +21,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Tracy\Debugger;
 use Webware\Traccio\Debug;
 
+
 class TracyDebuggerMiddleware implements MiddlewareInterface
 {
     final public const ENABLE_KEY = 'enable';
 
     public function __construct(
         private bool $debug,
+        /** @var TracyConfig $tracyConfig */
         private array $tracyConfig,
         private bool $enableSqlProfiler,
         private ?Debug\ConfigPanel $configPanel,

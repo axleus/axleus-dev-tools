@@ -21,8 +21,8 @@ use Tracy\IBarPanel;
 
 final class SqlProfilerPanel implements IBarPanel
 {
-    use IBarPanelTrait;
-
+    protected string $id;
+    
     public function __construct(
         private AdapterInterface $data,
     ) {

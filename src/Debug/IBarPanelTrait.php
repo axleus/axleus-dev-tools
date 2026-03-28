@@ -18,6 +18,8 @@ use Tracy\Helpers;
 
 trait IBarPanelTrait
 {
+    protected array|object $data;
+
     protected string $id;
 
     public function getTab(): string
@@ -39,8 +41,11 @@ trait IBarPanelTrait
         });
     }
 
-    public function setData($data): void
-    {
-        $this->data = $data;
-    }
+    /**
+     * @param array|object $data 
+     */
+    // public function setData($data): void
+    // {
+    //     $this->data = $data;
+    // }
 }
