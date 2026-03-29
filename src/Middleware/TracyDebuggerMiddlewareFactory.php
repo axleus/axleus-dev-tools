@@ -20,7 +20,7 @@ use Psr\Container\ContainerInterface;
 use Webware\Traccio\Configuration;
 use Webware\Traccio\Debug;
 
-final class TracyDebuggerMiddlewareFactory
+final readonly class TracyDebuggerMiddlewareFactory
 {
     public function __invoke(ContainerInterface $container): TracyDebuggerMiddleware
     {

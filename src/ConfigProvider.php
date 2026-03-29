@@ -30,7 +30,7 @@ use Tracy\Debugger;
  *     Debugger::class: TracyConfig,
  * }
  */
-final class ConfigProvider
+final readonly class ConfigProvider
 {
     /**
      * @phpstan-return ConfigShape

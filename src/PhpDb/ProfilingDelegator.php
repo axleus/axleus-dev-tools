@@ -19,7 +19,7 @@ use PhpDb\Adapter\AdapterInterface;
 use PhpDb\Adapter\Profiler\Profiler;
 use Psr\Container\ContainerInterface;
 
-final class ProfilingDelegator
+final readonly class ProfilingDelegator
 {
     public function __invoke(ContainerInterface $container, string $name, callable $callback): AdapterInterface
     {

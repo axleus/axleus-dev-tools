@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Debug;
 
+use Override;
 use Tracy\Helpers;
 use Tracy\IBarPanel;
 
@@ -30,6 +31,7 @@ final readonly class ConfigPanel implements IBarPanel
         $this->id = 'config';
     }
 
+    #[Override]
     public function getTab(): string
     {
         return Helpers::capture(function () {
@@ -40,6 +42,7 @@ final readonly class ConfigPanel implements IBarPanel
         });
     }
 
+    #[Override]
     public function getPanel(): string
     {
         return Helpers::capture(function () {

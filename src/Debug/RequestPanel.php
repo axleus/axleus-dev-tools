@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Debug;
 
+use Override;
 use Psr\Http\Message\ServerRequestInterface;
 use Tracy\Helpers;
 use Tracy\IBarPanel;
@@ -28,6 +29,7 @@ final class RequestPanel implements IBarPanel
         $this->id = 'request';
     }
 
+    #[Override]
     public function getTab(): string
     {
         return Helpers::capture(function () {
@@ -38,6 +40,7 @@ final class RequestPanel implements IBarPanel
         });
     }
 
+    #[Override]
     public function getPanel(): string
     {
         return Helpers::capture(function () {

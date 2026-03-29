@@ -17,7 +17,7 @@ namespace Webware\Traccio\Debug;
 use Mezzio\Router\RouteCollectorInterface;
 use Psr\Container\ContainerInterface;
 
-final class RoutesPanelFactory
+final readonly class RoutesPanelFactory
 {
     public function __invoke(ContainerInterface $container): RoutesPanel
     {
