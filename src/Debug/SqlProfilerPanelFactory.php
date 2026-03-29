@@ -17,7 +17,7 @@ namespace Webware\Traccio\Debug;
 use PhpDb\Adapter\AdapterInterface;
 use Psr\Container\ContainerInterface;
 
-final class SqlProfilerPanelFactory
+final readonly class SqlProfilerPanelFactory
 {
     public function __invoke(ContainerInterface $container): SqlProfilerPanel
     {

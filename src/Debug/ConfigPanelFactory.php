@@ -16,7 +16,7 @@ namespace Webware\Traccio\Debug;
 
 use Psr\Container\ContainerInterface;
 
-final class ConfigPanelFactory
+final readonly class ConfigPanelFactory
 {
     public function __invoke(ContainerInterface $container): ConfigPanel
     {

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Debug;
 
+use Override;
 use PhpDb\Adapter\AdapterInterface;
 use PhpDb\Adapter\Profiler\Profiler;
 use Tracy\Helpers;
@@ -29,6 +30,7 @@ final readonly class SqlProfilerPanel implements IBarPanel
         $this->id = 'database';
     }
 
+    #[Override]
     public function getTab(): string
     {
         return Helpers::capture(function () {
@@ -42,6 +44,7 @@ final readonly class SqlProfilerPanel implements IBarPanel
         });
     }
 
+    #[Override]
     public function getPanel(): string
     {
         return Helpers::capture(function () {

@@ -21,7 +21,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Tracy\Debugger;
 use Webware\Traccio\Debug;
 
-class RequestPanelMiddleware implements MiddlewareInterface
+final readonly class RequestPanelMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private Debug\RequestPanel $panel,

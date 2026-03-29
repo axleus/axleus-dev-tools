@@ -31,11 +31,12 @@ All debug panels follow a consistent pattern:
 Each panel consists of three components:
 
 1. **Panel Class** (e.g., `RoutesPanel.php`):
-   - Implements `Tracy\IBarPanel` interface
-   - Uses `IBarPanelTrait` for common rendering logic (most panels)
-   - Constructor receives typed data dependency
-   - Has a unique `$id` property matching panel name
-   - Complex panels (e.g., `SqlProfilerPanel`) override `getTab()` and `getPanel()` directly when they need to pre-process data before passing it to the template
+   - Implements `Tracy\IBarPanel` interface directly — no shared trait
+   - Declared `final readonly` (or `final` if `setData()` mutation is needed)
+   - Has a `private string $id` property set in the constructor
+   - Constructor receives typed data dependency via `private` constructor promotion
+   - Implements `getTab()` and `getPanel()` inline using `Tracy\Helpers::capture()`
+   - Complex panels (e.g., `SqlProfilerPanel`) inject pre-computed variables instead of raw `$data`
 
 2. **Factory Class** (e.g., `RoutesPanelFactory.php`):
    - Resolves dependencies from PSR-11 container
@@ -45,16 +46,14 @@ Each panel consists of three components:
    - **Tab template** (`{id}.tab.phtml`): Icon/label shown in Tracy bar
    - **Panel template** (`{id}.panel.phtml`): Full panel content when clicked
 
-#### IBarPanelTrait (`src/Debug/IBarPanelTrait.php`)
-- **Purpose**: Provides common panel rendering logic
+#### Panel Rendering Pattern
+- All panels implement `getTab()` and `getPanel()` **directly** on the panel class — there is no shared trait
 - **Variables injected into templates**:
   - `getTab()` injects `$data` (raw panel data) and `$title` (the panel `$id` string)
   - `getPanel()` injects `$data` (raw panel data)
-- **Methods**:
-  - `getTab()`: Wraps template require in `Tracy\Helpers::capture()`, injects `$data` and `$title`
-  - `getPanel()`: Wraps template require in `Tracy\Helpers::capture()`, injects `$data`
-  - `setData($data)`: Updates panel data dynamically
-- **Override pattern**: When a panel needs to transform or aggregate data before rendering (e.g., database profiling), override `getTab()` and `getPanel()` directly in the panel class and inject pre-computed variables rather than raw data
+- **Standard implementation**: Both methods wrap a `require` of the panel template inside `Tracy\Helpers::capture()`, injecting `$data` (and `$title` for the tab)
+- **Complex panels** (e.g., `SqlProfilerPanel`): inject pre-computed variables instead of raw `$data` when the dependency must be transformed before rendering
+- `setData()` should be added as a public method only when the data must be set after construction (e.g., `RequestPanel`, which receives the request from a later middleware)
 
 ### Existing Debug Panels
 
@@ -169,9 +168,9 @@ Each panel consists of three components:
 
 ### Creating a New Debug Panel
 
-#### Simple panel (uses IBarPanelTrait rendering)
+#### Simple panel (data passed directly to template)
 
-Use this when the template can work directly with the raw data dependency — no pre-processing needed.
+Use this when the template can work directly with the raw data dependency. All panels use `final readonly class` unless `setData()` mutation is required.
 
 1. **Create Panel Class** (`src/Debug/{Name}Panel.php`):
 ```php
@@ -180,16 +179,36 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Debug;
 
+use Tracy\Helpers;
 use Tracy\IBarPanel;
 
-final class {Name}Panel implements IBarPanel
+final readonly class {Name}Panel implements IBarPanel
 {
-    use IBarPanelTrait;
+    private string $id;
 
     public function __construct(
         private {DataType} $data,
     ) {
         $this->id = '{panel-id}';
+    }
+
+    public function getTab(): string
+    {
+        return Helpers::capture(function () {
+            $data  = $this->data;
+            $title = $this->id;
+
+            require __DIR__ . "/panels/{$this->id}.tab.phtml";
+        });
+    }
+
+    public function getPanel(): string
+    {
+        return Helpers::capture(function () {
+            $data = $this->data;
+
+            require __DIR__ . "/panels/{$this->id}.panel.phtml";
+        });
     }
 }
 ```
@@ -203,7 +222,7 @@ namespace Webware\Traccio\Debug;
 
 use Psr\Container\ContainerInterface;
 
-final class {Name}PanelFactory
+final readonly class {Name}PanelFactory
 {
     public function __invoke(ContainerInterface $container): {Name}Panel
     {
@@ -230,33 +249,42 @@ final class {Name}PanelFactory
    - Resolve it conditionally in `TracyDebuggerMiddlewareFactory`
    - Call `Debugger::getBar()->addPanel(...)` in the middleware `process()` method
 
-#### Complex panel (overrides getTab / getPanel)
+#### Complex panel (pre-processed data injected into template)
 
-Use this when the panel must aggregate, transform, or guard data before rendering — for example when the raw dependency is a service object rather than a plain data structure.
-
-Override both methods using `Tracy\Helpers::capture()` and inject only the variables the template needs:
+Use this when the panel must aggregate, transform, or guard data before rendering. Inject only the variables the template needs — do not pass the raw dependency:
 
 ```php
-public function getTab(): string
+final readonly class {Name}Panel implements IBarPanel
 {
-    return Helpers::capture(function () {
-        // compute $varA, $varB from $this->data
-        require __DIR__ . '/panels/{panel-id}.tab.phtml';
-    });
-}
+    private string $id;
 
-public function getPanel(): string
-{
-    return Helpers::capture(function () {
-        // compute $data from $this->data
-        require __DIR__ . '/panels/{panel-id}.panel.phtml';
-    });
+    public function __construct(
+        private {ServiceType} $data,
+    ) {
+        $this->id = '{panel-id}';
+    }
+
+    public function getTab(): string
+    {
+        return Helpers::capture(function () {
+            // compute $varA, $varB from $this->data
+            require __DIR__ . '/panels/{panel-id}.tab.phtml';
+        });
+    }
+
+    public function getPanel(): string
+    {
+        return Helpers::capture(function () {
+            // compute $data from $this->data
+            require __DIR__ . '/panels/{panel-id}.panel.phtml';
+        });
+    }
 }
 ```
 
 ### Panel Template Guidelines
 
-#### Tab Template Pattern (IBarPanelTrait — receives `$data` and `$title`):
+#### Tab Template Pattern (standard panel — receives `$data` and `$title`):
 ```php
 <?php
 declare(strict_types=1);
@@ -273,7 +301,7 @@ if (!isset($data)) {
 <span class="tracy-label"><?= isset($title) ? $title : 'Panel Name' ?></span>
 ```
 
-#### Tab Template Pattern (overridden getTab — receives pre-computed scalars):
+#### Tab Template Pattern (complex panel — receives pre-computed scalars):
 ```php
 <?php
 declare(strict_types=1);
@@ -287,7 +315,7 @@ $timeStr = ($total ?? 0.0) > 0.0 ? sprintf(' / %.1f ms', ($total ?? 0.0) * 1000)
 <span class="tracy-label"><?= 'Label: ' . ($count ?? '0') . $timeStr ?></span>
 ```
 
-#### Panel Template Pattern (IBarPanelTrait — receives raw `$data`):
+#### Panel Template Pattern (standard panel — receives raw `$data`):
 ```php
 <?php
 declare(strict_types=1);
@@ -309,7 +337,7 @@ Dumper::renderAssets();
 </div>
 ```
 
-#### Panel Template Pattern (overridden getPanel — receives pre-processed `$data` array):
+#### Panel Template Pattern (complex panel — receives pre-processed `$data` array):
 ```php
 <?php
 declare(strict_types=1);
@@ -460,7 +488,8 @@ composer sa-verbose        # Verbose static analysis
 - **Constructor Promotion**: Use `private` constructor property promotion
 
 ### PHPStan Configuration
-- **Level**: 5 (configured in `phpstan.neon.dist`)
+- **Level**: 10 (configured in `phpstan.neon.dist`)
+- **Global type alias**: `TracyConfig` defined in `phpstan.neon.dist` under `typeAliases` — no import needed in any file
 - **Stubs**: Custom stubs in `stubs/` for Laminas ServiceManager and PSR Container
 - **Baseline**: `phpstan-baseline.neon` for known/acceptable issues
 
