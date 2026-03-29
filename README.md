@@ -70,7 +70,7 @@ return [
 ];
 ```
 
-Set `'debug' => false` or enable Mezzio development mode in config.
+Set `'debug' => true` or enable Mezzio development mode in config.
 
 ---
 
