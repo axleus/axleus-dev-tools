@@ -4,18 +4,26 @@ declare(strict_types=1);
 
 namespace Webware\Traccio\Debug;
 
+use Mezzio\Router\Route;
+use Mezzio\Router\RouteCollectorInterface;
 use Tracy\Debugger;
 use Tracy\Dumper;
-use Mezzio\Router\RouteCollectorInterface;
 
-if(! $data instanceof RouteCollectorInterface) {
+if (! $data instanceof RouteCollectorInterface) {
     return;
 }
 
+$routes = array_reduce(
+    $data->getRoutes(),
+    static fn(array $carry, Route $route): array => $carry + [$route->getName() => $route],
+    []
+);
+ksort($routes);
+
 ?>
-<div class="tracy-inner tracy-QueryPanel">
+<div class="tracy-inner tracy-RoutesPanel">
     <div class="tracy-inner-container">
-        <?= Dumper::toHtml($data->getRoutes(), [
+        <?= Dumper::toHtml($routes, [
             Dumper::DEPTH => Debugger::$maxDepth,
             Dumper::ITEMS => Debugger::$maxItems,
             Dumper::TRUNCATE => Debugger::$maxLength,

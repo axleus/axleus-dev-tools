@@ -10,38 +10,6 @@ use Tracy\Helpers;
 $summary = $data['summary'];
 $groups  = $data['groups'];
 ?>
-<style class="tracy-debug">
-    /* ── Override Tracy's light-theme defaults for the entire panel ── */
-    #tracy-debug .tracy-QueryPanel { background: #1e1e1e; color: #d0d0d0; }
-    #tracy-debug .tracy-QueryPanel h1 { color: #d0d0d0; }
-    #tracy-debug .tracy-QueryPanel table { background: transparent; }
-    #tracy-debug .tracy-QueryPanel td,
-    #tracy-debug .tracy-QueryPanel th { border-color: #444; color: #d0d0d0; }
-    #tracy-debug .tracy-QueryPanel tr:nth-child(2n) td { background: rgba(255,255,255,.03); }
-
-    /* ── Summary table ── */
-    #tracy-debug .tracy-QueryPanel-summary { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
-    #tracy-debug .tracy-QueryPanel-summary th { background: #333; color: #aaa; padding: 4px 8px; text-align: left; font-weight: normal; font-size: .85em; }
-    #tracy-debug .tracy-QueryPanel-summary td { background: #252525; padding: 4px 8px; font-weight: bold; color: #e8e8e8; }
-
-    /* ── Group cards ── */
-    #tracy-debug .tracy-QueryPanel-group { margin-bottom: .6em; border: 1px solid #444; }
-    #tracy-debug .tracy-QueryPanel-group-header { background: #2d2d2d; padding: 5px 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-    #tracy-debug .tracy-QueryPanel-badge { background: #7a86b8; color: #fff; border-radius: 3px; padding: 0 5px; font-size: .8em; flex-shrink: 0; }
-    #tracy-debug .tracy-QueryPanel-sql { font-family: monospace; font-size: .9em; flex-grow: 1; word-break: break-all; color: #d4d4d4; }
-    #tracy-debug .tracy-QueryPanel-group-time { color: #888; font-size: .8em; flex-shrink: 0; }
-
-    /* ── Execution rows ── */
-    #tracy-debug .tracy-QueryPanel-executions { width: 100%; border-collapse: collapse; font-size: .9em; }
-    #tracy-debug .tracy-QueryPanel-executions th { background: #222; color: #888; padding: 2px 8px; font-weight: normal; text-align: left; }
-    #tracy-debug .tracy-QueryPanel-executions td { background: #1e1e1e; padding: 3px 8px; border-top: 1px solid #333; vertical-align: top; color: #c8c8c8; }
-    #tracy-debug .tracy-QueryPanel-executions tr:nth-child(2n) td { background: #232323; }
-
-    /* ── Parameter sub-table ── */
-    #tracy-debug .tracy-QueryPanel-params { background: transparent; }
-    #tracy-debug .tracy-QueryPanel-params td { background: transparent; border: none; padding: 0 4px; font-family: monospace; font-size: .9em; color: #c8c8c8; }
-    #tracy-debug .tracy-QueryPanel-params td:first-child { color: #777; }
-</style>
 <h1>Query Profiles</h1>
 <div class="tracy-inner tracy-QueryPanel">
     <div class="tracy-inner-container">

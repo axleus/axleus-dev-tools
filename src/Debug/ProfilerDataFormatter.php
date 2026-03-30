@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Webware\Traccio\Debug;
 
 use PhpDb\Adapter\ParameterContainer;
-use PhpDb\Adapter\Profiler\Profiler;
 
 use function array_key_exists;
 use function array_values;
