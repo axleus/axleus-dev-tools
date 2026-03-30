@@ -43,7 +43,6 @@ $groups  = $data['groups'];
     display: flex;
     align-items: baseline;
     gap: 8px;
-    flex-wrap: wrap;
 }
 
 #tracy-debug .tracy-QueryPanel-badge {
@@ -63,8 +62,14 @@ $groups  = $data['groups'];
 }
 
 #tracy-debug .tracy-QueryPanel-group-time {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 3px 8px;
     font-size: .8em;
-    flex-shrink: 0;
+    font-weight: bold;
+    border-top: 1px solid #555;
+    opacity: .85;
 }
 
 /* ── Execution rows ── */
@@ -123,12 +128,14 @@ $groups  = $data['groups'];
                     <div class="tracy-QueryPanel-group-header">
                         <span class="tracy-QueryPanel-badge"><?= $group['count'] ?>&times;</span>
                         <span class="tracy-QueryPanel-sql"><?= Helpers::escapeHtml($group['sql']) ?></span>
-                        <span class="tracy-QueryPanel-group-time">
-                            <?= sprintf('%.3f ms', $group['total_elapsed'] * 1000) ?> total
-                            &bull;
-                            avg <?= sprintf('%.3f ms', $group['avg_elapsed'] * 1000) ?>
-                        </span>
                     </div>
+                    <?php if ($group['count'] > 1): ?>
+                    <div class="tracy-QueryPanel-group-time">
+                        <span>total: <?= sprintf('%.3f ms', $group['total_elapsed'] * 1000) ?></span>
+                        <span>avg: <?= sprintf('%.3f ms', $group['avg_elapsed'] * 1000) ?></span>
+                        <span>slowest: <?= sprintf('%.3f ms', $group['slowest'] * 1000) ?></span>
+                    </div>
+                    <?php endif; ?>
                     <table class="tracy-QueryPanel-executions">
                         <thead>
                             <tr>
