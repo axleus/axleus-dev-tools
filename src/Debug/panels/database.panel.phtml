@@ -10,6 +10,98 @@ use Tracy\Helpers;
 $summary = $data['summary'];
 $groups  = $data['groups'];
 ?>
+<style class="tracy-debug">
+/* ── Override Tracy's light-theme defaults for the entire panel ── */
+#tracy-debug .tracy-QueryPanel table {
+    background: transparent;
+}
+
+/* ── Summary table ── */
+#tracy-debug .tracy-QueryPanel-summary {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+#tracy-debug .tracy-QueryPanel-summary th {
+    padding: 4px 8px;
+    text-align: left;
+    font-weight: normal;
+    font-size: .85em;
+}
+
+#tracy-debug .tracy-QueryPanel-summary td {
+    padding: 4px 8px;
+    font-weight: bold;
+}
+
+/* ── Group cards ── */
+#tracy-debug .tracy-QueryPanel-group {
+    margin-bottom: .6em;
+    border: 1px solid #444;
+}
+
+#tracy-debug .tracy-QueryPanel-group-header {
+    padding: 5px 8px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#tracy-debug .tracy-QueryPanel-badge {
+    background: #7a86b8;
+    color: #fff;
+    border-radius: 3px;
+    padding: 0 5px;
+    font-size: .8em;
+    flex-shrink: 0;
+}
+
+#tracy-debug .tracy-QueryPanel-sql {
+    font-family: monospace;
+    font-size: .9em;
+    flex-grow: 1;
+    word-break: break-all;
+}
+
+#tracy-debug .tracy-QueryPanel-group-time {
+    font-size: .8em;
+    flex-shrink: 0;
+}
+
+/* ── Execution rows ── */
+#tracy-debug .tracy-QueryPanel-executions {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9em;
+}
+
+#tracy-debug .tracy-QueryPanel-executions th {
+    padding: 2px 8px;
+    font-weight: normal;
+    text-align: left;
+}
+
+#tracy-debug .tracy-QueryPanel-executions td {
+    padding: 3px 8px;
+    border-top: 1px solid #333;
+    vertical-align: top;
+}
+
+/* ── Parameter sub-table ── */
+#tracy-debug .tracy-QueryPanel-params {
+    background: transparent;
+}
+
+#tracy-debug .tracy-QueryPanel-params td {
+    background: transparent;
+    border: none;
+    padding: 0 4px;
+    font-family: monospace;
+    font-size: .9em;
+}
+</style>
 <h1>Query Profiles</h1>
 <div class="tracy-inner tracy-QueryPanel">
     <div class="tracy-inner-container">
