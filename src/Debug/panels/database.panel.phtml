@@ -12,9 +12,6 @@ $groups  = $data['groups'];
 ?>
 <style class="tracy-debug">
 /* ── Override Tracy's light-theme defaults for the entire panel ── */
-#tracy-debug .tracy-QueryPanel table {
-    background: transparent;
-}
 
 /* ── Summary table ── */
 #tracy-debug .tracy-QueryPanel-summary {
@@ -89,13 +86,7 @@ $groups  = $data['groups'];
     vertical-align: top;
 }
 
-/* ── Parameter sub-table ── */
-#tracy-debug .tracy-QueryPanel-params {
-    background: transparent;
-}
-
 #tracy-debug .tracy-QueryPanel-params td {
-    background: transparent;
     border: none;
     padding: 0 4px;
     font-family: monospace;
